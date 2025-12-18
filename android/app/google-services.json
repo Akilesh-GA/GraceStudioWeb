@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "892215189826",
+    "project_id": "grace-studio-c020d",
+    "storage_bucket": "grace-studio-c020d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892215189826:android:e658a258c8e693b660a8db",
+        "android_client_info": {
+          "package_name": "com.example.grace_studio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqgCFc2JL2IQJNpZkoymxqGc-BGiID_4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
