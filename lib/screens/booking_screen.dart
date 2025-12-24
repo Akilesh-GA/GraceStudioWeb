@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 /// 🎨 STUDIO THEME COLORS
 const Color bgBlack = Color(0xFF0B0B0F);
@@ -13,7 +14,7 @@ class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key});
 
   @override
-  _BookingScreenState createState() => _BookingScreenState();
+  State<BookingScreen> createState() => _BookingScreenState();
 }
 
 class _BookingScreenState extends State<BookingScreen>
@@ -25,16 +26,20 @@ class _BookingScreenState extends State<BookingScreen>
   final dateController = TextEditingController();
   final messageController = TextEditingController();
 
-  String errorMessage = "";
-
   late AnimationController _controller;
   late Animation<double> fadeAnim;
   late Animation<Offset> slideAnim;
+
+  late Razorpay _razorpay;
+  int bookingAmount = 0;
+
+  String errorMessage = "";
 
   @override
   void initState() {
     super.initState();
 
+    /// Animations
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -51,17 +56,26 @@ class _BookingScreenState extends State<BookingScreen>
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
+    _controller.forward();
+
+    /// Razorpay Init
+    _razorpay = Razorpay();
+    _razorpay.on(
+        Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(
+        Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+
+    /// Auto-fill email
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       emailController.text = user.email ?? "";
     }
-
-    _controller.forward();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _razorpay.clear();
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
@@ -71,8 +85,7 @@ class _BookingScreenState extends State<BookingScreen>
     super.dispose();
   }
 
-  /// Date Picker Logic
-  /// Date Picker Logic (Dark Neon Theme)
+  /// 📅 Date Picker
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -82,15 +95,12 @@ class _BookingScreenState extends State<BookingScreen>
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: neonPink,       // Header & selected date color
-              onPrimary: Colors.white, // Text on selected date
-              onSurface: Colors.white, // Text for other dates
+            colorScheme: const ColorScheme.dark(
+              primary: neonPink,
+              onPrimary: Colors.white,
+              onSurface: Colors.white,
             ),
-            dialogBackgroundColor: cardBlack, // Calendar background
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: neonPink), // Buttons
-            ),
+            dialogBackgroundColor: cardBlack,
           ),
           child: child!,
         );
@@ -103,166 +113,8 @@ class _BookingScreenState extends State<BookingScreen>
     }
   }
 
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgBlack,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: FadeTransition(
-                    opacity: fadeAnim,
-                    child: SlideTransition(
-                      position: slideAnim,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 20),
-                          const Text(
-                            "Book a Service",
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            "Fill details to confirm your booking",
-                            style: TextStyle(fontSize: 16, color: textGrey),
-                          ),
-                          const SizedBox(height: 40),
-
-                          // Card
-                          Container(
-                            width: 340,
-                            padding: const EdgeInsets.all(25),
-                            decoration: BoxDecoration(
-                              color: cardBlack,
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 12),
-                                  color: neonPink.withOpacity(0.25),
-                                )
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                BookingInputField(
-                                  controller: nameController,
-                                  label: "Name",
-                                  icon: Icons.person_outline,
-                                ),
-                                const SizedBox(height: 18),
-                                BookingInputField(
-                                  controller: emailController,
-                                  label: "Email",
-                                  icon: Icons.email_outlined,
-                                ),
-                                const SizedBox(height: 18),
-                                BookingInputField(
-                                  controller: phoneController,
-                                  label: "Phone Number",
-                                  icon: Icons.phone_outlined,
-                                ),
-                                const SizedBox(height: 18),
-                                BookingInputField(
-                                  controller: serviceController,
-                                  label: "Service (Photography / Videography)",
-                                  icon: Icons.camera_alt_outlined,
-                                ),
-                                const SizedBox(height: 18),
-
-                                // Date Picker Field
-                                GestureDetector(
-                                  onTap: () => _selectDate(context),
-                                  child: AbsorbPointer(
-                                    child: BookingInputField(
-                                      controller: dateController,
-                                      label: "Preferred Date",
-                                      icon: Icons.calendar_today_outlined,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 18),
-                                BookingInputField(
-                                  controller: messageController,
-                                  label: "Additional Details",
-                                  icon: Icons.notes_outlined,
-                                  maxLines: 4,
-                                ),
-                                const SizedBox(height: 10),
-
-                                if (errorMessage.isNotEmpty)
-                                  Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                    child: Text(
-                                      errorMessage,
-                                      style: const TextStyle(
-                                          color: Colors.redAccent,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                const SizedBox(height: 20),
-
-                                // Submit Button
-                                GestureDetector(
-                                  onTap: _submitBooking,
-                                  child: Container(
-                                    height: 55,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      gradient: const LinearGradient(
-                                        colors: [purple, neonPink],
-                                      ),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        "Submit Booking",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  /// Firebase Booking Logic
-  Future<void> _submitBooking() async {
-    setState(() => errorMessage = "");
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      setState(() => errorMessage = "Please login to book a service");
-      return;
-    }
-
+  /// 💰 Ask Amount Dialog
+  Future<void> _askAmountAndPay() async {
     if (nameController.text.isEmpty ||
         phoneController.text.isEmpty ||
         serviceController.text.isEmpty ||
@@ -271,34 +123,218 @@ class _BookingScreenState extends State<BookingScreen>
       return;
     }
 
-    try {
-      await FirebaseFirestore.instance.collection("bookings").add({
-        "userId": user.uid,
-        "name": nameController.text.trim(),
-        "email": emailController.text.trim(),
-        "phone": phoneController.text.trim(),
-        "service": serviceController.text.trim(),
-        "preferredDate": dateController.text.trim(),
-        "message": messageController.text.trim(),
-        "createdAt": FieldValue.serverTimestamp(),
-        "status": "pending",
-      });
+    final TextEditingController amountController =
+    TextEditingController();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Booking submitted successfully")),
-      );
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: cardBlack,
+        title: const Text(
+          "Enter Amount",
+          style: TextStyle(color: Colors.white),
+        ),
+        content: TextField(
+          controller: amountController,
+          keyboardType: TextInputType.number,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: "Amount in ₹",
+            hintStyle: TextStyle(color: textGrey),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+            const Text("Cancel", style: TextStyle(color: neonPink)),
+          ),
+          TextButton(
+            onPressed: () {
+              bookingAmount = int.parse(amountController.text);
+              Navigator.pop(context);
+              _openPaymentGateway();
+            },
+            child:
+            const Text("Pay", style: TextStyle(color: neonPink)),
+          ),
+        ],
+      ),
+    );
+  }
 
-      nameController.clear();
-      phoneController.clear();
-      serviceController.clear();
-      dateController.clear();
-      messageController.clear();
-    } catch (e) {
-      setState(() => errorMessage = "Failed to submit booking");
-    }
+  /// 💳 Open Razorpay
+  void _openPaymentGateway() {
+    var options = {
+      'key': 'rzp_test_XXXXXXXXXXXXXXXX', // 🔑 TEST KEY
+      'amount': bookingAmount * 100,
+      'name': 'Grace Studio',
+      'description': 'Service Booking Payment',
+      'prefill': {
+        'contact': phoneController.text,
+        'email': emailController.text,
+      },
+      'theme': {'color': '#FF2FB3'},
+    };
+
+    _razorpay.open(options);
+  }
+
+  /// ✅ Payment Success
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    await _saveBooking(response.paymentId);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content: Text("Payment Successful & Booking Confirmed")),
+    );
+  }
+
+  /// ❌ Payment Failed
+  void _handlePaymentError(PaymentFailureResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Payment Failed")),
+    );
+  }
+
+  /// 🔥 Save Booking to Firebase
+  Future<void> _saveBooking(String? paymentId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    await FirebaseFirestore.instance.collection("bookings").add({
+      "userId": user.uid,
+      "name": nameController.text.trim(),
+      "email": emailController.text.trim(),
+      "phone": phoneController.text.trim(),
+      "service": serviceController.text.trim(),
+      "preferredDate": dateController.text.trim(),
+      "message": messageController.text.trim(),
+      "amount": bookingAmount,
+      "paymentId": paymentId,
+      "paymentStatus": "Paid",
+      "status": "confirmed",
+      "createdAt": FieldValue.serverTimestamp(),
+    });
+
+    nameController.clear();
+    phoneController.clear();
+    serviceController.clear();
+    dateController.clear();
+    messageController.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bgBlack,
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: fadeAnim,
+            child: SlideTransition(
+              position: slideAnim,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Book a Service",
+                    style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  const SizedBox(height: 20),
+
+                  /// CARD
+                  Container(
+                    width: 340,
+                    padding: const EdgeInsets.all(25),
+                    decoration: BoxDecoration(
+                      color: cardBlack,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 30,
+                          color: neonPink.withOpacity(0.25),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        BookingInputField(
+                            controller: nameController,
+                            label: "Name",
+                            icon: Icons.person),
+                        const SizedBox(height: 15),
+                        BookingInputField(
+                            controller: emailController,
+                            label: "Email",
+                            icon: Icons.email),
+                        const SizedBox(height: 15),
+                        BookingInputField(
+                            controller: phoneController,
+                            label: "Phone",
+                            icon: Icons.phone),
+                        const SizedBox(height: 15),
+                        BookingInputField(
+                            controller: serviceController,
+                            label: "Service",
+                            icon: Icons.camera_alt),
+                        const SizedBox(height: 15),
+
+                        GestureDetector(
+                          onTap: () => _selectDate(context),
+                          child: AbsorbPointer(
+                            child: BookingInputField(
+                                controller: dateController,
+                                label: "Preferred Date",
+                                icon: Icons.calendar_today),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        BookingInputField(
+                          controller: messageController,
+                          label: "Additional Details",
+                          icon: Icons.notes,
+                          maxLines: 3,
+                        ),
+                        const SizedBox(height: 20),
+
+                        GestureDetector(
+                          onTap: _askAmountAndPay,
+                          child: Container(
+                            height: 55,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                  colors: [purple, neonPink]),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Submit & Pay",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
+/// 🔹 Input Field Widget
 class BookingInputField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -315,23 +351,15 @@ class BookingInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBlack,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        cursorColor: neonPink,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: textGrey),
-          prefixIcon: Icon(icon, color: neonPink),
-          border: InputBorder.none, // removed underline
-        ),
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: textGrey),
+        prefixIcon: Icon(icon, color: neonPink),
+        border: InputBorder.none,
       ),
     );
   }
