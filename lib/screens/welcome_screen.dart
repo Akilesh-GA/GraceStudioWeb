@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -9,11 +10,23 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _controller;
   late Animation<double> fadeAnim;
   late Animation<Offset> slideAnim;
 
-  final Color tColor = Color(0xFF1ABC9C);
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  Timer? _timer;
+
+  // 🎨 Theme Colors
+  final Color purple = const Color(0xFF6D28D9);
+  final Color neonPink = const Color(0xFFEC4899);
+
+  final List<String> images = List.generate(
+    10,
+        (index) => 'assets/images/img${index + 1}.jpg',
+  );
 
   @override
   void initState() {
@@ -21,7 +34,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
     );
 
     fadeAnim = Tween<double>(begin: 0, end: 1).animate(
@@ -29,105 +42,134 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
 
     slideAnim = Tween<Offset>(
-      begin: Offset(0, 0.2),
+      begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
     _controller.forward();
+
+    // ⏱ Auto slide
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      _currentPage = (_currentPage + 1) % images.length;
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _pageController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: FadeTransition(
-            opacity: fadeAnim,
-            child: SlideTransition(
-              position: slideAnim,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Title
-                  Text(
-                    "Welcome to Grace Photo Studio",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
+      body: FadeTransition(
+        opacity: fadeAnim,
+        child: Stack(
+          children: [
 
-                  SizedBox(height: 10),
+            // 🔥 FULL SCREEN CAROUSEL
+            PageView.builder(
+              controller: _pageController,
+              itemCount: images.length,
+              itemBuilder: (context, index) {
+                return Image.asset(
+                  images[index],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                );
+              },
+            ),
 
-                  Text(
-                    "Book shoots • View portfolio • Manage gallery",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black54,
-                    ),
-                  ),
-
-                  SizedBox(height: 40),
-
-                  // Illustration (optional)
-                  Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: tColor.withOpacity(0.1),
-                    ),
-                    child: Icon(
-                      Icons.camera_alt_rounded,
-                      size: 120,
-                      color: tColor,
-                    ),
-                  ),
-
-                  SizedBox(height: 50),
-
-                  // Login Button
-                  _buildButton(
-                    label: "Login",
-                    color: tColor,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginScreen()),
-                      );
-                    },
-                  ),
-
-                  SizedBox(height: 18),
-
-                  // Register Button (outline)
-                  _buildButton(
-                    label: "Create an Account",
-                    color: Colors.white,
-                    border: true,
-                    textColor: tColor,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => RegisterScreen()),
-                      );
-                    },
-                  ),
-                ],
+            // 🎭 DARK OVERLAY
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.85),
+                    Colors.black.withOpacity(0.3),
+                  ],
+                ),
               ),
             ),
-          ),
+
+            // ✨ CONTENT (CENTERED FIX)
+            SafeArea(
+              child: Center( // ✅ ONLY IMPORTANT CHANGE
+                child: SlideTransition(
+                  position: slideAnim,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+
+                      Text(
+                        "Grace Photo Studio",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          color: neonPink,
+                          letterSpacing: 1.3,
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      Text(
+                        "Book shoots • View portfolio • Manage gallery",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
+
+                      const SizedBox(height: 50),
+
+                      // 🔘 Login Button
+                      _buildButton(
+                        label: "Login",
+                        gradient: true,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => LoginScreen()),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // 🔘 Register Button
+                      _buildButton(
+                        label: "Create an Account",
+                        border: true,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => RegisterScreen()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -136,9 +178,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget _buildButton({
     required String label,
     required VoidCallback onPressed,
-    required Color color,
+    bool gradient = false,
     bool border = false,
-    Color textColor = Colors.white,
   }) {
     return GestureDetector(
       onTap: onPressed,
@@ -146,26 +187,30 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         height: 55,
         width: 260,
         decoration: BoxDecoration(
-          color: color,
           borderRadius: BorderRadius.circular(30),
-          border: border ? Border.all(color: tColor, width: 2) : null,
-          boxShadow: border
-              ? []
-              : [
+          border: border ? Border.all(color: neonPink, width: 2) : null,
+          gradient: gradient
+              ? const LinearGradient(
+            colors: [Color(0xFF6D28D9), Color(0xFFEC4899)],
+          )
+              : null,
+          boxShadow: gradient
+              ? [
             BoxShadow(
-              color: tColor.withOpacity(0.4),
-              blurRadius: 20,
-              offset: Offset(0, 8),
+              color: neonPink.withOpacity(0.6),
+              blurRadius: 25,
+              offset: const Offset(0, 10),
             ),
-          ],
+          ]
+              : [],
         ),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
               fontSize: 18,
-              color: textColor,
               fontWeight: FontWeight.bold,
+              color: border ? neonPink : Colors.white,
             ),
           ),
         ),

@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 
+/// 🎨 STUDIO THEME COLORS
+const Color bgBlack = Color(0xFF0B0B0F);
+const Color purple = Color(0xFF7B2EFF);
+const Color neonPink = Color(0xFFFF2FB3);
+const Color cardBlack = Color(0xFF14141C);
+const Color textGrey = Color(0xFFB0B0C3);
+
 class JoinUsScreen extends StatefulWidget {
+  const JoinUsScreen({super.key});
+
   @override
   _JoinUsScreenState createState() => _JoinUsScreenState();
 }
@@ -16,8 +25,6 @@ class _JoinUsScreenState extends State<JoinUsScreen>
   final messageController = TextEditingController();
 
   String errorMessage = "";
-  final Color tColor = Color(0xFF1ABC9C);
-
   PlatformFile? selectedResume;
 
   late AnimationController _controller;
@@ -30,7 +37,7 @@ class _JoinUsScreenState extends State<JoinUsScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 700),
     );
 
     fadeAnim = Tween<double>(begin: 0, end: 1).animate(
@@ -38,7 +45,7 @@ class _JoinUsScreenState extends State<JoinUsScreen>
     );
 
     slideAnim = Tween<Offset>(
-      begin: Offset(0, 0.2),
+      begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -65,151 +72,163 @@ class _JoinUsScreenState extends State<JoinUsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgBlack,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: FadeTransition(
-              opacity: fadeAnim,
-              child: SlideTransition(
-                position: slideAnim,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Join Us",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      "Become a part of Grace Studio's creative team",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(height: 30),
-
-                    // CARD
-                    Container(
-                      width: 340,
-                      padding: EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 20,
-                            offset: Offset(0, 10),
-                            color: Colors.black.withOpacity(0.07),
-                          )
-                        ],
-                      ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: FadeTransition(
+                    opacity: fadeAnim,
+                    child: SlideTransition(
+                      position: slideAnim,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          JoinInputField(
-                            controller: nameController,
-                            label: "Full Name",
-                            icon: Icons.person_outline,
+                          const Text(
+                            "Join Us",
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                          SizedBox(height: 18),
-
-                          JoinInputField(
-                            controller: emailController,
-                            label: "Email",
-                            icon: Icons.email_outlined,
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Become a part of Grace Studio's creative team",
+                            style: TextStyle(fontSize: 16, color: textGrey),
                           ),
-                          SizedBox(height: 18),
+                          const SizedBox(height: 40),
 
-                          JoinInputField(
-                            controller: roleController,
-                            label: "Role (Photographer, Videographer, etc.)",
-                            icon: Icons.work_outline,
-                          ),
-                          SizedBox(height: 18),
+                          // Card
+                          Container(
+                            width: 340,
+                            padding: const EdgeInsets.all(25),
+                            decoration: BoxDecoration(
+                              color: cardBlack,
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 12),
+                                  color: neonPink.withOpacity(0.25),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                JoinInputField(
+                                  controller: nameController,
+                                  label: "Full Name",
+                                  icon: Icons.person_outline,
+                                ),
+                                const SizedBox(height: 18),
+                                JoinInputField(
+                                  controller: emailController,
+                                  label: "Email",
+                                  icon: Icons.email_outlined,
+                                ),
+                                const SizedBox(height: 18),
+                                JoinInputField(
+                                  controller: roleController,
+                                  label: "Role (Photographer, Videographer, etc.)",
+                                  icon: Icons.work_outline,
+                                ),
+                                const SizedBox(height: 18),
+                                JoinInputField(
+                                  controller: messageController,
+                                  label: "Tell us about yourself",
+                                  icon: Icons.message_outlined,
+                                  maxLines: 4,
+                                ),
+                                const SizedBox(height: 18),
 
-                          JoinInputField(
-                            controller: messageController,
-                            label: "Tell us about yourself",
-                            icon: Icons.message_outlined,
-                            maxLines: 4,
-                          ),
-                          SizedBox(height: 18),
-
-                          // PDF Upload Field
-                          GestureDetector(
-                            onTap: _pickResume,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: tColor),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.upload_file, color: tColor),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      selectedResume != null
-                                          ? selectedResume!.name
-                                          : "Upload Resume (PDF)",
-                                      style: TextStyle(fontSize: 16),
+                                // Resume Picker
+                                GestureDetector(
+                                  onTap: _pickResume,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16, horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      color: cardBlack,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(color: neonPink, width: 1.5),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.upload_file, color: neonPink),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            selectedResume != null
+                                                ? selectedResume!.name
+                                                : "Upload Resume (PDF)",
+                                            style: const TextStyle(
+                                                fontSize: 16, color: Colors.white),
+                                          ),
+                                        ),
+                                        Icon(Icons.arrow_forward_ios,
+                                            size: 16, color: neonPink),
+                                      ],
                                     ),
                                   ),
-                                  Icon(Icons.arrow_forward_ios, size: 16, color: tColor),
-                                ],
-                              ),
-                            ),
-                          ),
+                                ),
+                                const SizedBox(height: 10),
 
-                          SizedBox(height: 10),
-                          if (errorMessage.isNotEmpty)
-                            Text(
-                              errorMessage,
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                                if (errorMessage.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(
+                                      errorMessage,
+                                      style: const TextStyle(
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
 
-                          SizedBox(height: 20),
+                                const SizedBox(height: 20),
 
-                          GestureDetector(
-                            onTap: _submitJoinRequest,
-                            child: Container(
-                              height: 55,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: tColor,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Apply Now",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                // Submit Button
+                                GestureDetector(
+                                  onTap: _submitJoinRequest,
+                                  child: Container(
+                                    height: 55,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      gradient: const LinearGradient(
+                                        colors: [purple, neonPink],
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        "Apply Now",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  // Pick PDF resume
   Future<void> _pickResume() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -223,7 +242,6 @@ class _JoinUsScreenState extends State<JoinUsScreen>
     }
   }
 
-  /// 🔥 FIREBASE LOGIC
   Future<void> _submitJoinRequest() async {
     setState(() => errorMessage = "");
 
@@ -237,13 +255,12 @@ class _JoinUsScreenState extends State<JoinUsScreen>
         emailController.text.isEmpty ||
         roleController.text.isEmpty ||
         selectedResume == null) {
-      setState(() => errorMessage = "Please fill all required fields and upload your resume");
+      setState(() => errorMessage =
+      "Please fill all required fields and upload your resume");
       return;
     }
 
     try {
-      // For simplicity, storing only the file name in Firestore.
-      // If you want to upload to Firebase Storage, you can replace this part.
       await FirebaseFirestore.instance.collection("join_requests").add({
         "userId": user.uid,
         "name": nameController.text.trim(),
@@ -256,7 +273,7 @@ class _JoinUsScreenState extends State<JoinUsScreen>
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Application submitted successfully")),
+        const SnackBar(content: Text("Application submitted successfully")),
       );
 
       nameController.clear();
@@ -270,7 +287,6 @@ class _JoinUsScreenState extends State<JoinUsScreen>
   }
 }
 
-/// INPUT FIELD (SAME STYLE AS LOGIN)
 class JoinInputField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -278,6 +294,7 @@ class JoinInputField extends StatelessWidget {
   final int maxLines;
 
   const JoinInputField({
+    super.key,
     required this.controller,
     required this.label,
     required this.icon,
@@ -286,25 +303,24 @@ class JoinInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color tColor = Color(0xFF1ABC9C);
-
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      cursorColor: tColor,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: tColor),
-        border: InputBorder.none,
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: tColor.withOpacity(0.5), width: 1),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: tColor, width: 2),
-        ),
-        contentPadding: EdgeInsets.only(bottom: 5),
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBlack,
+        borderRadius: BorderRadius.circular(12),
       ),
-      style: TextStyle(fontSize: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        cursorColor: neonPink,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: textGrey),
+          prefixIcon: Icon(icon, color: neonPink),
+          border: InputBorder.none, // removed underline
+        ),
+      ),
     );
   }
 }

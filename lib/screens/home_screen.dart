@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'login_screen.dart';
 import 'about_screen.dart';
-import 'projects_screen.dart';
 import 'contact_screen.dart';
-import 'booking_screen.dart';
 import 'joinus_screen.dart';
+import 'projects_screen.dart';
+import 'booking_screen.dart';
+import 'dart:ui';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,7 +18,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _hoveredItem = '';
+  final PageController _pageController = PageController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  int _currentPage = 0;
+  String _hoveredItem = "";
 
   final List<String> menuItems = [
     "About",
@@ -23,148 +32,336 @@ class _HomeScreenState extends State<HomeScreen> {
     "Join Us",
   ];
 
+  final List<String> images = [
+    "assets/images/img1.jpg",
+    "assets/images/img2.jpg",
+    "assets/images/img3.jpg",
+    "assets/images/img4.jpg",
+    "assets/images/img5.jpg",
+    "assets/images/img6.jpg",
+    "assets/images/img7.jpg",
+    "assets/images/img8.jpg",
+    "assets/images/img9.jpg",
+    "assets/images/img10.jpg",
+  ];
+
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      _currentPage = (_currentPage + 1) % images.length;
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 900),
+        curve: Curves.easeInOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _logout() async {
+    await _auth.signOut();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
+
   void _navigateTo(String page) {
-    Widget targetPage;
+    Widget? screen;
+
     switch (page) {
       case "About":
-        targetPage = const AboutScreen();
+        screen = const AboutScreen();
         break;
       case "Projects":
-        targetPage = const ProjectsScreen();
+        screen = const ProjectsScreen();
         break;
       case "Contact Us":
-        targetPage = const ContactUsScreen();
+        screen = const ContactUsScreen();
         break;
       case "Booking":
-        targetPage = BookingScreen();
+        screen = BookingScreen();
         break;
       case "Join Us":
-        targetPage = JoinUsScreen();
+        screen = JoinUsScreen();
         break;
-      default:
-        targetPage = const HomeScreen();
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => targetPage),
-    );
+    if (screen != null) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 600),
+          pageBuilder: (_, __, ___) => screen!,
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.2, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          /// NAVIGATION BAR
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.tealAccent.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /// LOGO
-                Row(
-                  children: const [
-                    Icon(Icons.camera_alt_rounded,
-                        color: Colors.tealAccent, size: 28),
-                    SizedBox(width: 10),
-                    Text(
-                      "Grace Studio",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
+      backgroundColor: Colors.black,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+
+            SizedBox(
+              height: screenHeight,
+              child: Stack(
+                children: [
+
+                  /// BACKGROUND IMAGES
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: images.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(images[index]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  /// DARK OVERLAY
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(0.8),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.9),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                       ),
                     ),
-                  ],
-                ),
+                  ),
 
-                /// MENU ITEMS
-                Row(
-                  children: menuItems.map((item) {
-                    bool isHovered = _hoveredItem == item;
-                    return MouseRegion(
-                      onEnter: (_) => setState(() => _hoveredItem = item),
-                      onExit: (_) => setState(() => _hoveredItem = ''),
-                      child: GestureDetector(
-                        onTap: () => _navigateTo(item),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                  /// ================= NAVBAR =================
+                  Positioned(
+                    top: 30,
+                    left: 20,
+                    right: 20,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(30)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                item,
-                                style: TextStyle(
-                                  color: isHovered
-                                      ? Colors.tealAccent
-                                      : Colors.white70,
-                                  fontSize: 18,
-                                  fontWeight: isHovered
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
+
+                              /// LOGO
+                              Row(
+                                children: const [
+                                  Text(
+                                    "Grace Studio",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              /// MENU
+                              Row(
+                                children: menuItems.map((item) {
+                                  final isHovered = _hoveredItem == item;
+                                  return MouseRegion(
+                                    onEnter: (_) => setState(() => _hoveredItem = item),
+                                    onExit: (_) => setState(() => _hoveredItem = ""),
+                                    child: GestureDetector(
+                                      onTap: () => _navigateTo(item),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 250),
+                                        margin: const EdgeInsets.symmetric(horizontal: 14),
+                                        padding: const EdgeInsets.symmetric(vertical: 6),
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: isHovered
+                                                  ? const Color(0xFF9D4EDD)
+                                                  : Colors.transparent,
+                                              width: 2,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          item,
+                                          style: TextStyle(
+                                            color: isHovered
+                                                ? const Color(0xFF9D4EDD)
+                                                : Colors.white70,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+
+                              /// LOGOUT
+                              GestureDetector(
+                                onTap: _logout,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF7B2EFF), // Purple
+                                        Color(0xFFFF2EC4), // Neon Pink
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xFFFF2EC4).withOpacity(0.55),
+                                        blurRadius: 25,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.logout, size: 18, color: Colors.white),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        "Logout",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                              /// Animated underline only
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                height: 3,
-                                width: isHovered ? 30 : 0,
-                                margin: const EdgeInsets.only(top: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.tealAccent,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
+
                             ],
                           ),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-
-          /// PAGE BODY
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    "Welcome to Grace Studio",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 12),
-                  Text(
-                    "Photography • Videography • Events • Portfolio Creation",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 18,
+
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text(
+                          "Moments That Last Forever",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          "Wedding • Portrait • Events • Cinematic Shoots",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          )
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 50),
+              color: Colors.black,
+              child: Column(
+                children: [
+                  const Text(
+                    "Grace Studio",
+                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _socialIcon(FontAwesomeIcons.facebook),
+                      _socialIcon(FontAwesomeIcons.instagram),
+                      _socialIcon(FontAwesomeIcons.twitter),
+                      _socialIcon(FontAwesomeIcons.youtube),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "© 2025 Grace Studio. All Rights Reserved",
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _socialIcon(IconData icon) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFFFF2EC4)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF9D4EDD).withOpacity(0.6),
+            blurRadius: 12,
+          ),
         ],
+      ),
+      child: FaIcon(
+        icon,
+        color: const Color(0xFFFF2EC4),
+        size: 18,
       ),
     );
   }

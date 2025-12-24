@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
+
+/// 🎨 STUDIO THEME COLORS
+const Color bgBlack = Color(0xFF0B0B0F);
+const Color purple = Color(0xFF7B2EFF);
+const Color neonPink = Color(0xFFFF2FB3);
+const Color cardBlack = Color(0xFF14141C);
+const Color textGrey = Color(0xFFB0B0C3);
 
 class BookingScreen extends StatefulWidget {
+  const BookingScreen({super.key});
+
   @override
   _BookingScreenState createState() => _BookingScreenState();
 }
@@ -19,8 +27,6 @@ class _BookingScreenState extends State<BookingScreen>
 
   String errorMessage = "";
 
-  final Color tColor = Color(0xFF1ABC9C);
-
   late AnimationController _controller;
   late Animation<double> fadeAnim;
   late Animation<Offset> slideAnim;
@@ -31,7 +37,7 @@ class _BookingScreenState extends State<BookingScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 700),
     );
 
     fadeAnim = Tween<double>(begin: 0, end: 1).animate(
@@ -39,7 +45,7 @@ class _BookingScreenState extends State<BookingScreen>
     );
 
     slideAnim = Tween<Offset>(
-      begin: Offset(0, 0.2),
+      begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -65,23 +71,26 @@ class _BookingScreenState extends State<BookingScreen>
     super.dispose();
   }
 
-  /// 📅 Date Picker Logic (NO business logic change)
+  /// Date Picker Logic
+  /// Date Picker Logic (Dark Neon Theme)
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime.now(), // prevent past dates
+      firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 2),
-
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Color(0xFF1ABC9C), // header + selected date
-              onPrimary: Colors.white,   // text on header
-              onSurface: Colors.black,   // calendar text
+            colorScheme: ColorScheme.dark(
+              primary: neonPink,       // Header & selected date color
+              onPrimary: Colors.white, // Text on selected date
+              onSurface: Colors.white, // Text for other dates
             ),
-            dialogBackgroundColor: Colors.white,
+            dialogBackgroundColor: cardBlack, // Calendar background
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: neonPink), // Buttons
+            ),
           ),
           child: child!,
         );
@@ -98,139 +107,153 @@ class _BookingScreenState extends State<BookingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgBlack,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: FadeTransition(
-              opacity: fadeAnim,
-              child: SlideTransition(
-                position: slideAnim,
-                child: Column(
-                  children: [
-                    Text(
-                      "Book a Service",
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      "Fill details to confirm your booking",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(height: 30),
-
-                    /// CARD
-                    Container(
-                      width: 340,
-                      padding: EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 20,
-                            offset: Offset(0, 10),
-                            color: Colors.black.withOpacity(0.07),
-                          )
-                        ],
-                      ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: FadeTransition(
+                    opacity: fadeAnim,
+                    child: SlideTransition(
+                      position: slideAnim,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          BookingInputField(
-                            controller: nameController,
-                            label: "Name",
-                            icon: Icons.person_outline,
-                          ),
-                          SizedBox(height: 18),
-
-                          BookingInputField(
-                            controller: emailController,
-                            label: "Email",
-                            icon: Icons.email_outlined,
-                          ),
-                          SizedBox(height: 18),
-
-                          BookingInputField(
-                            controller: phoneController,
-                            label: "Phone Number",
-                            icon: Icons.phone_outlined,
-                          ),
-                          SizedBox(height: 18),
-
-                          BookingInputField(
-                            controller: serviceController,
-                            label: "Service (Photography / Videography)",
-                            icon: Icons.camera_alt_outlined,
-                          ),
-                          SizedBox(height: 18),
-
-                          /// 📅 DATE FIELD (Calendar Picker)
-                          GestureDetector(
-                            onTap: () => _selectDate(context),
-                            child: AbsorbPointer(
-                              child: BookingInputField(
-                                controller: dateController,
-                                label: "Preferred Date",
-                                icon: Icons.calendar_today_outlined,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 18),
-
-                          BookingInputField(
-                            controller: messageController,
-                            label: "Additional Details",
-                            icon: Icons.notes_outlined,
-                            maxLines: 4,
-                          ),
-                          SizedBox(height: 10),
-
-                          if (errorMessage.isNotEmpty)
-                            Text(
-                              errorMessage,
-                              style: TextStyle(
-                                color: Colors.red,
+                          const SizedBox(height: 20),
+                          const Text(
+                            "Book a Service",
+                            style: TextStyle(
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
-                              ),
+                                color: Colors.white),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Fill details to confirm your booking",
+                            style: TextStyle(fontSize: 16, color: textGrey),
+                          ),
+                          const SizedBox(height: 40),
+
+                          // Card
+                          Container(
+                            width: 340,
+                            padding: const EdgeInsets.all(25),
+                            decoration: BoxDecoration(
+                              color: cardBlack,
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 12),
+                                  color: neonPink.withOpacity(0.25),
+                                )
+                              ],
                             ),
+                            child: Column(
+                              children: [
+                                BookingInputField(
+                                  controller: nameController,
+                                  label: "Name",
+                                  icon: Icons.person_outline,
+                                ),
+                                const SizedBox(height: 18),
+                                BookingInputField(
+                                  controller: emailController,
+                                  label: "Email",
+                                  icon: Icons.email_outlined,
+                                ),
+                                const SizedBox(height: 18),
+                                BookingInputField(
+                                  controller: phoneController,
+                                  label: "Phone Number",
+                                  icon: Icons.phone_outlined,
+                                ),
+                                const SizedBox(height: 18),
+                                BookingInputField(
+                                  controller: serviceController,
+                                  label: "Service (Photography / Videography)",
+                                  icon: Icons.camera_alt_outlined,
+                                ),
+                                const SizedBox(height: 18),
 
-                          SizedBox(height: 20),
-
-                          /// SUBMIT BUTTON
-                          GestureDetector(
-                            onTap: _submitBooking,
-                            child: Container(
-                              height: 55,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: tColor,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Submit Booking",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                // Date Picker Field
+                                GestureDetector(
+                                  onTap: () => _selectDate(context),
+                                  child: AbsorbPointer(
+                                    child: BookingInputField(
+                                      controller: dateController,
+                                      label: "Preferred Date",
+                                      icon: Icons.calendar_today_outlined,
+                                    ),
                                   ),
                                 ),
-                              ),
+                                const SizedBox(height: 18),
+                                BookingInputField(
+                                  controller: messageController,
+                                  label: "Additional Details",
+                                  icon: Icons.notes_outlined,
+                                  maxLines: 4,
+                                ),
+                                const SizedBox(height: 10),
+
+                                if (errorMessage.isNotEmpty)
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(
+                                      errorMessage,
+                                      style: const TextStyle(
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                const SizedBox(height: 20),
+
+                                // Submit Button
+                                GestureDetector(
+                                  onTap: _submitBooking,
+                                  child: Container(
+                                    height: 55,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      gradient: const LinearGradient(
+                                        colors: [purple, neonPink],
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        "Submit Booking",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  /// 🔥 FIREBASE BOOKING LOGIC (UNCHANGED)
+  /// Firebase Booking Logic
   Future<void> _submitBooking() async {
     setState(() => errorMessage = "");
 
@@ -262,7 +285,7 @@ class _BookingScreenState extends State<BookingScreen>
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Booking submitted successfully")),
+        const SnackBar(content: Text("Booking submitted successfully")),
       );
 
       nameController.clear();
@@ -276,7 +299,6 @@ class _BookingScreenState extends State<BookingScreen>
   }
 }
 
-/// INPUT FIELD (UI UNCHANGED)
 class BookingInputField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -284,6 +306,7 @@ class BookingInputField extends StatelessWidget {
   final int maxLines;
 
   const BookingInputField({
+    super.key,
     required this.controller,
     required this.label,
     required this.icon,
@@ -292,25 +315,24 @@ class BookingInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color tColor = Color(0xFF1ABC9C);
-
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      cursorColor: tColor,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: tColor),
-        border: InputBorder.none,
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: tColor.withOpacity(0.5), width: 1),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: tColor, width: 2),
-        ),
-        contentPadding: EdgeInsets.only(bottom: 5),
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBlack,
+        borderRadius: BorderRadius.circular(12),
       ),
-      style: TextStyle(fontSize: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        cursorColor: neonPink,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: textGrey),
+          prefixIcon: Icon(icon, color: neonPink),
+          border: InputBorder.none, // removed underline
+        ),
+      ),
     );
   }
 }

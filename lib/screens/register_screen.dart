@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// 🎨 STUDIO THEME COLORS
+const Color bgBlack = Color(0xFF0B0B0F);
+const Color cardBlack = Color(0xFF14141C);
+const Color purple = Color(0xFF7B2EFF);
+const Color neonPink = Color(0xFFFF2FB3);
+const Color textGrey = Color(0xFFB0B0C3);
+
 class RegisterScreen extends StatefulWidget {
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
@@ -17,8 +24,6 @@ class _RegisterScreenState extends State<RegisterScreen>
   String errorMessage = "";
   String selectedRole = "User";
 
-  final Color tColor = Color(0xFF1ABC9C);
-
   late AnimationController _controller;
   late Animation<double> fadeAnim;
   late Animation<Offset> slideAnim;
@@ -29,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 700),
     );
 
     fadeAnim = Tween<double>(begin: 0, end: 1).animate(
@@ -37,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
 
     slideAnim = Tween<Offset>(
-      begin: Offset(0, 0.2),
+      begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -59,6 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgBlack,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -69,76 +75,77 @@ class _RegisterScreenState extends State<RegisterScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Create Account",
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 6),
-                    Text(
+                    const SizedBox(height: 6),
+                    const Text(
                       "Register to get started",
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: textGrey,
+                      ),
                     ),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
 
+                    /// 🧾 REGISTER CARD
                     Container(
                       width: 340,
-                      padding: EdgeInsets.all(25),
+                      padding: const EdgeInsets.all(25),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cardBlack,
                         borderRadius: BorderRadius.circular(25),
                         boxShadow: [
                           BoxShadow(
-                            blurRadius: 20,
-                            offset: Offset(0, 10),
-                            color: Colors.black.withOpacity(0.07),
+                            blurRadius: 30,
+                            offset: const Offset(0, 12),
+                            color: neonPink.withOpacity(0.25),
                           )
                         ],
                       ),
                       child: Column(
                         children: [
-
-                          // 🔥 ADDED ROLE TOGGLE (NO BORDER)
+                          /// 🔥 ROLE TOGGLE
                           Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 _roleButton("User", Icons.person),
-                                _roleButton("Admin", Icons.admin_panel_settings),
+                                _roleButton(
+                                    "Admin", Icons.admin_panel_settings),
                               ],
                             ),
                           ),
 
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
                           InputField(
                             controller: nameController,
                             label: "Full Name",
                             icon: Icons.person_outline,
                           ),
-                          SizedBox(height: 18),
+                          const SizedBox(height: 18),
 
                           InputField(
                             controller: phoneController,
                             label: "Phone Number",
                             icon: Icons.phone_outlined,
                           ),
-                          SizedBox(height: 18),
+                          const SizedBox(height: 18),
 
                           InputField(
                             controller: emailController,
                             label: "Email",
                             icon: Icons.email_outlined,
                           ),
-                          SizedBox(height: 18),
+                          const SizedBox(height: 18),
 
                           InputField(
                             controller: passwordController,
@@ -146,29 +153,32 @@ class _RegisterScreenState extends State<RegisterScreen>
                             icon: Icons.lock_outline,
                             isPassword: true,
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
                           if (errorMessage.isNotEmpty)
                             Text(
                               errorMessage,
-                              style: TextStyle(
-                                color: Colors.red,
+                              style: const TextStyle(
+                                color: Colors.redAccent,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
 
-                          SizedBox(height: 20),
+                          const SizedBox(height: 22),
 
+                          /// 🚀 SIGN UP BUTTON
                           GestureDetector(
                             onTap: _handleRegister,
                             child: Container(
                               height: 55,
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: tColor,
                                 borderRadius: BorderRadius.circular(30),
+                                gradient: const LinearGradient(
+                                  colors: [purple, neonPink],
+                                ),
                               ),
-                              child: Center(
+                              child: const Center(
                                 child: Text(
                                   "Sign Up",
                                   style: TextStyle(
@@ -181,16 +191,16 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ),
 
-                          SizedBox(height: 25),
+                          const SizedBox(height: 25),
 
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
                             },
-                            child: Text(
+                            child: const Text(
                               "Already have an account? Login",
                               style: TextStyle(
-                                color: tColor,
+                                color: neonPink,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -208,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  // 🔥 ROLE BUTTON WIDGET
+  /// 🔥 ROLE BUTTON
   Widget _roleButton(String role, IconData icon) {
     bool isSelected = selectedRole == role;
 
@@ -219,24 +229,24 @@ class _RegisterScreenState extends State<RegisterScreen>
         });
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 250),
-        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? tColor : Colors.transparent,
+          color: isSelected ? neonPink : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : tColor,
+              color: isSelected ? Colors.white : neonPink,
               size: 20,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               role,
               style: TextStyle(
-                color: isSelected ? Colors.white : tColor,
+                color: isSelected ? Colors.white : neonPink,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -246,6 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
+  /// ================= REGISTER LOGIC =================
   Future<void> _handleRegister() async {
     setState(() => errorMessage = "");
 
@@ -300,6 +311,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 }
 
+/// ================= INPUT FIELD =================
 class InputField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -313,28 +325,25 @@ class InputField extends StatelessWidget {
     this.isPassword = false,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
-    final Color tColor = Color(0xFF1ABC9C);
-
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      cursorColor: tColor,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: tColor),
-
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: tColor, width: 2),
-        ),
-        contentPadding: EdgeInsets.only(bottom: 5),
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBlack,
+        borderRadius: BorderRadius.circular(12),
       ),
-      style: TextStyle(fontSize: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: TextField(
+        controller: controller,
+        cursorColor: neonPink,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: textGrey),
+          prefixIcon: Icon(icon, color: neonPink),
+          border: InputBorder.none, // removed underline
+        ),
+      ),
     );
   }
 }

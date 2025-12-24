@@ -5,193 +5,272 @@ class ProjectsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color tColor = Color(0xFF1ABC9C);
+    final Color tColor = const Color(0xFF1ABC9C);
 
-    // Sample project data
     final List<Map<String, String>> projects = [
       {
         'title': 'Wedding Photography',
-        'image': 'https://via.placeholder.com/400x250.png?text=Wedding+Photography',
-        'description': 'Capturing beautiful moments of weddings and celebrations.'
+        'image': 'assets/images/img1.jpg',
+        'description': 'Elegant and emotional wedding moments captured forever.'
       },
       {
         'title': 'Corporate Events',
-        'image': 'https://via.placeholder.com/400x250.png?text=Corporate+Events',
-        'description': 'Professional photography for corporate and business events.'
+        'image': 'assets/images/img2.jpg',
+        'description': 'Professional photography for business conferences.'
       },
       {
         'title': 'Portrait Sessions',
-        'image': 'https://via.placeholder.com/400x250.png?text=Portrait+Sessions',
-        'description': 'Individual or family portrait sessions with creativity.'
+        'image': 'assets/images/img3.jpg',
+        'description': 'Creative personal and family portrait photography.'
       },
       {
         'title': 'Travel Photography',
-        'image': 'https://via.placeholder.com/400x250.png?text=Travel+Photography',
-        'description': 'Capturing landscapes and travel adventures.'
+        'image': 'assets/images/img4.jpg',
+        'description': 'Breathtaking travel destinations and landscapes.'
+      },
+      {
+        'title': 'Birthday Events',
+        'image': 'assets/images/img5.jpg',
+        'description': 'Joyful birthday celebrations with beautiful moments.'
+      },
+      {
+        'title': 'Engagement Shoots',
+        'image': 'assets/images/img6.jpg',
+        'description': 'Romantic pre-wedding and engagement photography.'
+      },
+      {
+        'title': 'Fashion Photography',
+        'image': 'assets/images/img7.jpg',
+        'description': 'High-end fashion shoots for brands and models.'
+      },
+      {
+        'title': 'Product Photography',
+        'image': 'assets/images/img8.jpg',
+        'description': 'Clean and professional product visuals.'
+      },
+      {
+        'title': 'Baby Photography',
+        'image': 'assets/images/img9.jpg',
+        'description': 'Cute and heart-warming baby photoshoots.'
+      },
+      {
+        'title': 'Drone Shoots',
+        'image': 'assets/images/img10.jpg',
+        'description': 'Cinematic aerial photography using drones.'
       },
     ];
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          /// NAVIGATION BAR (simplified)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: tColor.withOpacity(0.3),
-                width: 1,
+      backgroundColor: const Color(0xFF0B0B0F),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Our Projects",
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: const [
-                    Icon(Icons.camera_alt_rounded, color: Colors.tealAccent, size: 28),
-                    SizedBox(width: 10),
-                    Text(
-                      "Grace Studio",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          /// PAGE CONTENT
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Our Projects",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Here are some of the latest photography and videography projects by Grace Studio.",
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      fontSize: 18,
-                      height: 1.6,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  /// PROJECT CARDS
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 1.4,
-                    ),
-                    itemCount: projects.length,
-                    itemBuilder: (context, index) {
-                      final project = projects[index];
-                      return ProjectCard(
-                        title: project['title']!,
-                        description: project['description']!,
-                        imageUrl: project['image']!,
-                      );
-                    },
-                  ),
-                ],
+            const SizedBox(height: 10),
+            const Text(
+              "Crafted moments, timeless stories",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 35),
+
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate:
+              const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 30,
+                mainAxisSpacing: 30,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: projects.length,
+              itemBuilder: (context, index) {
+                final project = projects[index];
+                return ProjectCard(
+                  title: project['title']!,
+                  description: project['description']!,
+                  imagePath: project['image']!,
+                  themeColor: tColor,
+                  delay: index * 120,
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class ProjectCard extends StatelessWidget {
+class ProjectCard extends StatefulWidget {
   final String title;
   final String description;
-  final String imageUrl;
+  final String imagePath;
+  final Color themeColor;
+  final int delay;
 
   const ProjectCard({
+    super.key,
     required this.title,
     required this.description,
-    required this.imageUrl,
+    required this.imagePath,
+    required this.themeColor,
+    required this.delay,
   });
 
   @override
+  State<ProjectCard> createState() => _ProjectCardState();
+}
+
+class _ProjectCardState extends State<ProjectCard>
+    with SingleTickerProviderStateMixin {
+  bool _hovered = false;
+
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _fade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    Future.delayed(Duration(milliseconds: widget.delay), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Color tColor = Color(0xFF1ABC9C);
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: AnimatedScale(
+            scale: _hovered ? 1.04 : 1,
+            duration: const Duration(milliseconds: 250),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                color: const Color(0xFF14141C),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.themeColor
+                        .withOpacity(_hovered ? 0.35 : 0.12),
+                    blurRadius: _hovered ? 30 : 18,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  /// IMAGE
+                  Expanded(
+                    flex: 8,
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(22)),
+                          child: Image.asset(
+                            widget.imagePath,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(22)),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.55),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// IMAGE
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: Image.network(
-              imageUrl,
-              height: 140,
-              width: double.infinity,
-              fit: BoxFit.cover,
+                  /// TEXT
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: TextStyle(
+                              color: widget.themeColor,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            widget.description,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-
-          /// TITLE & DESCRIPTION
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: tColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  description,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
