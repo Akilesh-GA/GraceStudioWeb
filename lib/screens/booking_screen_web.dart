@@ -115,7 +115,7 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
     }
 
     final options = js.JsObject.jsify({
-      'key': 'rzp_test_RvvN9GKGLnVUym',
+      'key': 'rzp_test_',
       'amount': bookingAmount * 100,
       'currency': 'INR',
       'name': 'Grace Studio',
