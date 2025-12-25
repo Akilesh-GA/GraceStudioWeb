@@ -57,33 +57,6 @@ Grace Studio is a Flutter-based cross-platform application for booking photograp
 - Google Chrome (for web)
 - Firebase project (for authentication, optional)
 
-## Project Structure
-
-grace_studio/
-├─ android/
-├─ ios/
-├─ lib/
-│ ├─ main.dart
-│ ├─ screens/
-│ │ ├─ login_screen.dart
-│ │ ├─ register_screen.dart
-│ │ ├─ home_screen.dart
-│ │ ├─ booking_screen_web.dart
-│ │ ├─ booking_history.dart
-│ │ ├─ profile_screen.dart
-│ │ └─ firebase_screens.dart
-│ ├─ widgets/
-│ │ ├─ booking_input_field.dart
-│ │ ├─ booking_dropdown_field.dart
-│ │ └─ custom_button.dart
-│ └─ services/
-│ ├─ payment_service.dart
-│ └─ firebase_service.dart
-├─ web/
-│ └─ index.html
-├─ pubspec.yaml
-└─ README.md
-
 ### Tech Stack
 
 Technologies Used
