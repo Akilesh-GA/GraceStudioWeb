@@ -7,8 +7,8 @@ import 'about_screen.dart';
 import 'contact_screen.dart';
 import 'joinus_screen.dart';
 import 'projects_screen.dart';
-import 'booking_screen.dart';
 import 'dart:ui';
+import 'booking_screen_web.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         screen = const ContactUsScreen();
         break;
       case "Booking":
-        screen = BookingScreen();
+        screen = const BookingScreenWeb();
         break;
       case "Join Us":
         screen = JoinUsScreen();
