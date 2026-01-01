@@ -33,13 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   final List<String> images = [
+    "assets/images/img2.jpg",
     "assets/images/city1.jpg",
     "assets/images/nature4.jpg",
     "assets/images/nature2.jpg",
     "assets/images/marriage1.jpg",
     "assets/images/chennai.jpg",
-    "assets/images/img2.jpg",
-    "assets/images/img3.jpg",
     "assets/images/monkey.jpg",
   ];
 

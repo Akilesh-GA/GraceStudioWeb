@@ -10,52 +10,47 @@ class ProjectsScreen extends StatelessWidget {
     final List<Map<String, String>> projects = [
       {
         'title': 'Wedding Photography',
-        'image': 'assets/images/img1.jpg',
+        'image': 'assets/images/marriage1.jpg',
         'description': 'Elegant and emotional wedding moments captured forever.'
       },
       {
         'title': 'Corporate Events',
-        'image': 'assets/images/img2.jpg',
+        'image': 'assets/images/corporate_event.jpeg',
         'description': 'Professional photography for business conferences.'
       },
       {
         'title': 'Portrait Sessions',
-        'image': 'assets/images/img3.jpg',
+        'image': 'assets/images/portrait.jpeg',
         'description': 'Creative personal and family portrait photography.'
       },
       {
         'title': 'Travel Photography',
-        'image': 'assets/images/img4.jpg',
+        'image': 'assets/images/travel.jpg',
         'description': 'Breathtaking travel destinations and landscapes.'
       },
       {
         'title': 'Birthday Events',
-        'image': 'assets/images/img5.jpg',
+        'image': 'assets/images/birthday.jpg',
         'description': 'Joyful birthday celebrations with beautiful moments.'
       },
       {
-        'title': 'Engagement Shoots',
-        'image': 'assets/images/img6.jpg',
-        'description': 'Romantic pre-wedding and engagement photography.'
-      },
-      {
-        'title': 'Fashion Photography',
-        'image': 'assets/images/img7.jpg',
-        'description': 'High-end fashion shoots for brands and models.'
+        'title': 'Nature Photography',
+        'image': 'assets/images/nature.jpg',
+        'description': 'Rich and Realistic Nature photography.'
       },
       {
         'title': 'Product Photography',
-        'image': 'assets/images/img8.jpg',
+        'image': 'assets/images/product.jpg',
         'description': 'Clean and professional product visuals.'
       },
       {
         'title': 'Baby Photography',
-        'image': 'assets/images/img9.jpg',
+        'image': 'assets/images/baby.jpg',
         'description': 'Cute and heart-warming baby photoshoots.'
       },
       {
         'title': 'Drone Shoots',
-        'image': 'assets/images/img10.jpg',
+        'image': 'assets/images/city1.jpg',
         'description': 'Cinematic aerial photography using drones.'
       },
     ];

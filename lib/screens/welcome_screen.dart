@@ -22,10 +22,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   final Color purple = const Color(0xFF6D28D9);
   final Color neonPink = const Color(0xFFEC4899);
 
-  final List<String> images = List.generate(
-    10,
-        (index) => 'assets/images/img${index + 1}.jpg',
-  );
+  final List<String> images = [
+    "assets/images/img2.jpg",
+    "assets/images/city1.jpg",
+    "assets/images/nature4.jpg",
+    "assets/images/nature2.jpg",
+    "assets/images/marriage1.jpg",
+    "assets/images/chennai.jpg",
+    "assets/images/monkey.jpg",
+  ];
 
   @override
   void initState() {
