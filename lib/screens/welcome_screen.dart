@@ -19,7 +19,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   int _currentPage = 0;
   Timer? _timer;
 
-  // 🎨 Theme Colors
   final Color purple = const Color(0xFF6D28D9);
   final Color neonPink = const Color(0xFFEC4899);
 
@@ -50,7 +49,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     _controller.forward();
 
-    // ⏱ Auto slide
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       _currentPage = (_currentPage + 1) % images.length;
       _pageController.animateToPage(
@@ -76,8 +74,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         opacity: fadeAnim,
         child: Stack(
           children: [
-
-            // 🔥 FULL SCREEN CAROUSEL
             PageView.builder(
               controller: _pageController,
               itemCount: images.length,
@@ -91,7 +87,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               },
             ),
 
-            // 🎭 DARK OVERLAY
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -105,9 +100,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
 
-            // ✨ CONTENT (CENTERED FIX)
             SafeArea(
-              child: Center( // ✅ ONLY IMPORTANT CHANGE
+              child: Center(
                 child: SlideTransition(
                   position: slideAnim,
                   child: Column(
@@ -139,7 +133,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                       const SizedBox(height: 50),
 
-                      // 🔘 Login Button
                       _buildButton(
                         label: "Login",
                         gradient: true,
@@ -153,7 +146,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                       const SizedBox(height: 18),
 
-                      // 🔘 Register Button
                       _buildButton(
                         label: "Create an Account",
                         border: true,

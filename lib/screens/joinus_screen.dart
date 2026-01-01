@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 
-/// 🎨 STUDIO THEME COLORS
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color purple = Color(0xFF7B2EFF);
 const Color neonPink = Color(0xFFFF2FB3);
@@ -102,7 +101,6 @@ class _JoinUsScreenState extends State<JoinUsScreen>
                           ),
                           const SizedBox(height: 40),
 
-                          // Card
                           Container(
                             width: 340,
                             padding: const EdgeInsets.all(25),
@@ -145,7 +143,6 @@ class _JoinUsScreenState extends State<JoinUsScreen>
                                 ),
                                 const SizedBox(height: 18),
 
-                                // Resume Picker
                                 GestureDetector(
                                   onTap: _pickResume,
                                   child: Container(
@@ -190,7 +187,6 @@ class _JoinUsScreenState extends State<JoinUsScreen>
 
                                 const SizedBox(height: 20),
 
-                                // Submit Button
                                 GestureDetector(
                                   onTap: _submitJoinRequest,
                                   child: Container(
@@ -318,7 +314,7 @@ class JoinInputField extends StatelessWidget {
           labelText: label,
           labelStyle: const TextStyle(color: textGrey),
           prefixIcon: Icon(icon, color: neonPink),
-          border: InputBorder.none, // removed underline
+          border: InputBorder.none,
         ),
       ),
     );

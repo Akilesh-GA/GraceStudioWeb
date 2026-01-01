@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/booking_input_field.dart';
-import '../widgets/booking_dropdown_field.dart';
 import 'dart:js' as js;
 
-/// 🎨 STUDIO THEME COLORS
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color purple = Color(0xFF7B2EFF);
 const Color neonPink = Color(0xFFFF2FB3);
@@ -76,7 +74,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
     super.dispose();
   }
 
-  /// 📅 Date Picker
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -104,7 +101,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
     }
   }
 
-  /// 💳 Razorpay Web Payment
   void _openRazorpayWeb() {
     if (nameController.text.isEmpty ||
         phoneController.text.isEmpty ||
@@ -191,7 +187,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
       }
     });
 
-    // Open Razorpay Checkout
     js.context.callMethod('Razorpay', [options]).callMethod('open');
   }
 
@@ -218,7 +213,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
                     ),
                     const SizedBox(height: 20),
 
-                    /// CARD
                     Container(
                       width: 340,
                       padding: const EdgeInsets.all(25),
@@ -250,7 +244,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
                               icon: Icons.phone),
                           const SizedBox(height: 15),
 
-                          // ----------------- SERVICE DROPDOWN -----------------
                           Container(
                             decoration: BoxDecoration(
                               color: cardBlack,

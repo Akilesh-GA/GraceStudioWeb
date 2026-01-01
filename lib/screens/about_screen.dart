@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const Color bgBlack = Color(0xFF0B0B0F);
-const Color mapBg = Color(0xFF101018); // UPDATED MAP BACKGROUND
+const Color mapBg = Color(0xFF101018);
 const Color purple = Color(0xFF9D4EDD);
 const Color neonPink = Color(0xFFFF2FB3);
 const Color textGrey = Color(0xFFB0B0C3);
@@ -73,7 +73,6 @@ class _AboutScreenState extends State<AboutScreen>
                   ),
                   const SizedBox(height: 20),
 
-                  /// ABOUT
                   const Text(
                     "Grace Studio began as a passion-driven journey rooted in the love for capturing genuine emotions and untold stories through a lens.\n"
                         "Over time, that passion evolved into a creative studio recognized for its authenticity, consistent quality, and the deep trust built with every client.\n"
@@ -86,7 +85,6 @@ class _AboutScreenState extends State<AboutScreen>
                   ),
                   const SizedBox(height: 40),
 
-                  /// MISSION
                   const Text(
                     "Our Mission",
                     style: TextStyle(
@@ -108,7 +106,6 @@ class _AboutScreenState extends State<AboutScreen>
                   ),
                   const SizedBox(height: 40),
 
-                  /// MAP TITLE
                   const Text(
                     "Our Journey",
                     style: TextStyle(
@@ -119,9 +116,8 @@ class _AboutScreenState extends State<AboutScreen>
                   ),
                   const SizedBox(height: 30),
 
-                  /// MAP VIEW (HEIGHT INCREASED)
                   Container(
-                    height: 460, // 🔼 increased height
+                    height: 460,
                     decoration: BoxDecoration(
                       color: mapBg,
                       borderRadius: BorderRadius.circular(24),
@@ -136,7 +132,6 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                     child: Stack(
                       children: [
-                        /// ROUTE PATH (ANIMATED GLOW)
                         Positioned.fill(
                           child: AnimatedBuilder(
                             animation: _controller,
@@ -150,7 +145,6 @@ class _AboutScreenState extends State<AboutScreen>
                           ),
                         ),
 
-                        /// MARKERS (UNCHANGED POSITIONS)
                         const Positioned(
                           left: 40,
                           bottom: 80,
@@ -229,7 +223,6 @@ class _AboutScreenState extends State<AboutScreen>
   }
 }
 
-/// ================= MAP MARKER =================
 class MapMarker extends StatelessWidget {
   final String title;
   final String subtitle;

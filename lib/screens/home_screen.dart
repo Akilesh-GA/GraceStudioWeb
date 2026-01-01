@@ -135,7 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Stack(
                 children: [
 
-                  /// BACKGROUND IMAGES
                   PageView.builder(
                     controller: _pageController,
                     itemCount: images.length,
@@ -151,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
 
-                  /// DARK OVERLAY
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -166,7 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  /// ================= NAVBAR =================
                   Positioned(
                     top: 30,
                     left: 20,
@@ -185,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
 
-                              /// LOGO
                               Row(
                                 children: const [
                                   Text(
@@ -199,7 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
 
-                              /// MENU
                               Row(
                                 children: menuItems.map((item) {
                                   final isHovered = _hoveredItem == item;
@@ -237,7 +232,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 }).toList(),
                               ),
 
-                              /// LOGOUT
                               GestureDetector(
                                 onTap: _logout,
                                 child: Container(
@@ -246,8 +240,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     borderRadius: BorderRadius.circular(30),
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color(0xFF7B2EFF), // Purple
-                                        Color(0xFFFF2EC4), // Neon Pink
+                                        Color(0xFF7B2EFF),
+                                        Color(0xFFFF2EC4),
                                       ],
                                     ),
                                     boxShadow: [

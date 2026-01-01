@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 class BookingScreen extends StatelessWidget {
   const BookingScreen({super.key});
 
-  /// Razorpay Web Checkout
   void _openRazorpayWeb(BuildContext context) {
     final options = {
-      'key': 'rzp_test_RvvN9GKGLnVUym', // 🔴 Replace with your TEST KEY
-      'amount': 100, // ₹1 = 100 paise
+      'key': 'rzp_test_RvvN9GKGLnVUym',
+      'amount': 100,
       'currency': 'INR',
       'name': 'Grace Studio',
       'description': 'Slot Booking Payment',
-      'image': 'https://your-logo-url.png', // optional
+      'image': 'https://your-logo-url.png',
       'prefill': {
         'contact': '9999999999',
         'email': 'test@email.com',

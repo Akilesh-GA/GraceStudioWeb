@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// 🎨 STUDIO THEME COLORS
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color cardBlack = Color(0xFF14141C);
 const Color purple = Color(0xFF7B2EFF);
@@ -93,7 +92,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                     ),
                     const SizedBox(height: 30),
 
-                    /// 🧾 REGISTER CARD
                     Container(
                       width: 340,
                       padding: const EdgeInsets.all(25),
@@ -110,7 +108,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                       child: Column(
                         children: [
-                          /// 🔥 ROLE TOGGLE
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 10),
@@ -166,7 +163,6 @@ class _RegisterScreenState extends State<RegisterScreen>
 
                           const SizedBox(height: 22),
 
-                          /// 🚀 SIGN UP BUTTON
                           GestureDetector(
                             onTap: _handleRegister,
                             child: Container(
@@ -218,7 +214,6 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  /// 🔥 ROLE BUTTON
   Widget _roleButton(String role, IconData icon) {
     bool isSelected = selectedRole == role;
 
@@ -256,7 +251,6 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  /// ================= REGISTER LOGIC =================
   Future<void> _handleRegister() async {
     setState(() => errorMessage = "");
 
@@ -311,7 +305,6 @@ class _RegisterScreenState extends State<RegisterScreen>
   }
 }
 
-/// ================= INPUT FIELD =================
 class InputField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -341,7 +334,7 @@ class InputField extends StatelessWidget {
           labelText: label,
           labelStyle: const TextStyle(color: textGrey),
           prefixIcon: Icon(icon, color: neonPink),
-          border: InputBorder.none, // removed underline
+          border: InputBorder.none,
         ),
       ),
     );

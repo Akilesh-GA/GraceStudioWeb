@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
-/// 🎨 STUDIO THEME COLORS (NON-NULL, WEB SAFE)
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color purple = Color(0xFF7B2EFF);
 const Color neonPink = Color(0xFFFF2FB3);
@@ -94,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           const SizedBox(height: 40),
 
-                          /// 🔐 LOGIN CARD
                           Container(
                             width: 340,
                             padding: const EdgeInsets.all(25),
@@ -152,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen>
 
                                 const SizedBox(height: 25),
 
-                                /// 🚀 LOGIN BUTTON
                                 GestureDetector(
                                   onTap: _handleLogin,
                                   child: Container(
@@ -213,7 +210,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  /// ================= LOGIN LOGIC =================
   Future<void> _handleLogin() async {
     setState(() => errorMessage = "");
 
@@ -242,7 +238,6 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  /// ================= FORGOT PASSWORD =================
   Future<void> _forgotPassword() async {
     final email = emailController.text.trim();
 
@@ -256,7 +251,6 @@ class _LoginScreenState extends State<LoginScreen>
   }
 }
 
-/// ================= INPUT FIELD =================
 class LoginInputField extends StatefulWidget {
   final TextEditingController controller;
   final String label;
@@ -294,14 +288,14 @@ class _LoginInputFieldState extends State<LoginInputField> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: TextField(
         controller: widget.controller,
-        obscureText: _obscureText, // hide password
+        obscureText: _obscureText,
         cursorColor: neonPink,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: const TextStyle(color: textGrey),
           prefixIcon: Icon(widget.icon, color: neonPink),
-          border: InputBorder.none, // removed underline
+          border: InputBorder.none,
           suffixIcon: widget.isPassword
               ? IconButton(
             icon: Icon(

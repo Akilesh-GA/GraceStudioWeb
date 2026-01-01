@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// 🎨 THEME COLORS
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color cardBlack = Color(0xFF14141C);
 const Color purple = Color(0xFF9D4EDD);
@@ -24,7 +23,6 @@ class ContactUsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// ================= HEADER =================
               const Text(
                 "Get in Touch",
                 style: TextStyle(
@@ -46,7 +44,6 @@ class ContactUsScreen extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              /// ================= SERVICES SECTION =================
               const Text(
                 "Our Services",
                 style: TextStyle(
@@ -57,14 +54,14 @@ class ContactUsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 50),
               Row(
-                mainAxisAlignment: MainAxisAlignment.start, // start cards from left
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: const [
                   ServiceCard(
                     icon: Icons.camera_alt,
                     title: "Photography",
                     description: "We breathe photography. Our team is passionate, young, and creative.",
                   ),
-                  SizedBox(width: 70), // gap between cards
+                  SizedBox(width: 70),
                   ServiceCard(
                     icon: Icons.videocam,
                     title: "Video",
@@ -93,7 +90,6 @@ class ContactUsScreen extends StatelessWidget {
 
               const SizedBox(height: 60),
 
-              /// ================= CONTACT FORM =================
               const Text(
                 "Send Us a Message",
                 style: TextStyle(
@@ -142,7 +138,6 @@ class ContactUsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 30),
 
-                      /// SEND BUTTON
                       GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(

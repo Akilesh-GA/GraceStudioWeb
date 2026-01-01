@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// 🎨 STUDIO THEME COLORS
 const Color neonPink = Color(0xFFFF2FB3);
 const Color textGrey = Color(0xFFB0B0C3);
 const Color cardBlack = Color(0xFF14141C);
