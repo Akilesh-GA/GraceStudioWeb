@@ -15,13 +15,8 @@ class ProjectsScreen extends StatelessWidget {
       },
       {
         'title': 'Corporate Events',
-        'image': 'assets/images/corporate_event.jpeg',
+        'image': 'assets/images/corporate_event.webp',
         'description': 'Professional photography for business conferences.'
-      },
-      {
-        'title': 'Portrait Sessions',
-        'image': 'assets/images/portrait.jpeg',
-        'description': 'Creative personal and family portrait photography.'
       },
       {
         'title': 'Travel Photography',
