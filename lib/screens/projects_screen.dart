@@ -40,7 +40,7 @@ class ProjectsScreen extends StatelessWidget {
       },
       {
         'title': 'Baby Photography',
-        'image': 'assets/images/baby.jpg',
+        'image': 'assets/images/baby.jpeg',
         'description': 'Cute and heart-warming baby photoshoots.'
       },
       {

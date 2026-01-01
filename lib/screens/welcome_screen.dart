@@ -23,13 +23,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   final Color neonPink = const Color(0xFFEC4899);
 
   final List<String> images = [
+    "assets/images/nature.jpg",
     "assets/images/img2.jpg",
     "assets/images/city1.jpg",
-    "assets/images/nature4.jpg",
-    "assets/images/nature2.jpg",
     "assets/images/marriage1.jpg",
-    "assets/images/chennai.jpg",
-    "assets/images/monkey.jpg",
+    "assets/images/birthday.jpg",
   ];
 
   @override
