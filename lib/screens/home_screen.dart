@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> menuItems = [
     "About",
-    "Projects",
+    "Portfolio",
     "Contact Us",
     "Booking",
     "Join Us",
@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case "About":
         screen = const AboutScreen();
         break;
-      case "Projects":
+      case "Portfolio":
         screen = const ProjectsScreen();
         break;
       case "Contact Us":

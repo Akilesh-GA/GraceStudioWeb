@@ -5,60 +5,70 @@ class ProjectsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color tColor = const Color(0xFF1ABC9C);
+    // THEME COLORS (updated)
+    final Color tColor = const Color(0xFF6D28D9); // Purple
+    final Color neonPink = const Color(0xFFEC4899);
 
     final List<Map<String, String>> projects = [
       {
         'title': 'Wedding Photography',
         'image': 'assets/images/marriage1.jpg',
-        'description': 'Elegant and emotional wedding moments captured forever.'
+        'description':
+        'Elegant and emotional wedding moments captured forever.\nPreserving timeless memories that tell your love story.'
       },
       {
         'title': 'Corporate Events',
         'image': 'assets/images/corporate_event.webp',
-        'description': 'Professional photography for business conferences.'
+        'description':
+        'Professional photography for business conferences.\nEnhancing corporate identity through high-quality visuals.'
       },
       {
         'title': 'Travel Photography',
         'image': 'assets/images/travel.jpg',
-        'description': 'Breathtaking travel destinations and landscapes.'
+        'description':
+        'Breathtaking travel destinations and landscapes.\nShowcasing cultures, adventures, and scenic beauty.'
       },
       {
         'title': 'Birthday Events',
         'image': 'assets/images/birthday.jpg',
-        'description': 'Joyful birthday celebrations with beautiful moments.'
+        'description':
+        'Joyful birthday celebrations with beautiful moments.\nCapturing fun, laughter, and special memories.'
       },
       {
         'title': 'Nature Photography',
         'image': 'assets/images/nature.jpg',
-        'description': 'Rich and Realistic Nature photography.'
+        'description':
+        'Rich and realistic nature photography.\nHighlighting the beauty of landscapes and wildlife.'
       },
       {
         'title': 'Product Photography',
         'image': 'assets/images/product.webp',
-        'description': 'Clean and professional product visuals.'
+        'description':
+        'Clean and professional product visuals.\nDesigned to attract customers and boost brand value.'
       },
       {
         'title': 'Baby Photography',
         'image': 'assets/images/baby.jpg',
-        'description': 'Cute and heart-warming baby photoshoots.'
+        'description':
+        'Cute and heart-warming baby photoshoots.\nPreserving precious early-life moments forever.'
       },
       {
         'title': 'Drone Shoots',
         'image': 'assets/images/city1.jpg',
-        'description': 'Cinematic aerial photography using drones.'
+        'description':
+        'Cinematic aerial photography using drones.\nOffering stunning perspectives and dynamic visuals.'
       },
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0B0F),
+      backgroundColor: const Color(0xFF0A0615), // darker purple-black
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Our Projects",
+              "Our Portfolio",
               style: TextStyle(
                 fontSize: 38,
                 fontWeight: FontWeight.bold,
@@ -92,7 +102,7 @@ class ProjectsScreen extends StatelessWidget {
                   title: project['title']!,
                   description: project['description']!,
                   imagePath: project['image']!,
-                  themeColor: tColor,
+                  themeColor: index.isEven ? tColor : neonPink,
                   delay: index * 120,
                 );
               },
@@ -179,19 +189,18 @@ class _ProjectCardState extends State<ProjectCard>
               duration: const Duration(milliseconds: 250),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(22),
-                color: const Color(0xFF14141C),
+                color: const Color(0xFF140F22), // purple-tinted card
                 boxShadow: [
                   BoxShadow(
                     color: widget.themeColor
-                        .withOpacity(_hovered ? 0.35 : 0.12),
-                    blurRadius: _hovered ? 30 : 18,
+                        .withOpacity(_hovered ? 0.4 : 0.15),
+                    blurRadius: _hovered ? 32 : 18,
                     offset: const Offset(0, 12),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  /// IMAGE
                   Expanded(
                     flex: 8,
                     child: Stack(
@@ -212,7 +221,7 @@ class _ProjectCardState extends State<ProjectCard>
                             gradient: LinearGradient(
                               colors: [
                                 Colors.transparent,
-                                Colors.black.withOpacity(0.55),
+                                Colors.black.withOpacity(0.6),
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -222,8 +231,6 @@ class _ProjectCardState extends State<ProjectCard>
                       ],
                     ),
                   ),
-
-                  /// TEXT
                   Expanded(
                     flex: 3,
                     child: Padding(
