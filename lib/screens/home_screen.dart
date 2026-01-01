@@ -34,15 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> images = [
     "assets/images/city1.jpg",
-    "assets/images/nature1.jpg",
     "assets/images/nature2.jpg",
     "assets/images/img2.jpg",
     "assets/images/img3.jpg",
     "assets/images/marriage1.jpg",
-    "assets/images/img6.jpg",
-    "assets/images/img9.jpg",
-    "assets/images/nature3.jpg",
-    "assets/images/marriage2.jpg",
   ];
 
   Timer? _timer;
