@@ -35,12 +35,12 @@ class ProjectsScreen extends StatelessWidget {
       },
       {
         'title': 'Product Photography',
-        'image': 'assets/images/product.jpg',
+        'image': 'assets/images/product.webp',
         'description': 'Clean and professional product visuals.'
       },
       {
         'title': 'Baby Photography',
-        'image': 'assets/images/baby.jpeg',
+        'image': 'assets/images/baby.jpg',
         'description': 'Cute and heart-warming baby photoshoots.'
       },
       {
