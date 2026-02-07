@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
+import 'admin/admin_home_screen.dart';
 
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color purple = Color(0xFF7B2EFF);
@@ -210,10 +212,34 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// 🔹 FETCH ROLE FROM FIRESTORE
+  Future<String> _getUserRole(String email) async {
+    try {
+      final query = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final data = query.docs.first.data();
+        final role = data['role']?.toString().trim();
+        if (role != null && role.isNotEmpty) {
+          return role;
+        }
+      } else {
+        print("No user document found for email: $email");
+      }
+    } catch (e) {
+      print("Firestore role fetch error: $e");
+    }
+    return "User"; // default role
+  }
+
+  /// 🔹 HANDLE LOGIN WITH ROLE-BASED NAVIGATION
   Future<void> _handleLogin() async {
     setState(() => errorMessage = "");
-
-    final email = emailController.text.trim();
+    final email = emailController.text.trim().toLowerCase();
     final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
@@ -222,21 +248,35 @@ class _LoginScreenState extends State<LoginScreen>
     }
 
     try {
+      // 1️⃣ Sign in
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      // 2️⃣ Fetch role from Firestore
+      final role = (await _getUserRole(email)).toLowerCase();
+      print("Logged in as role: $role"); // Debug
+
+      // 3️⃣ Role-based redirection
+      if (role == "admin") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? "Login failed";
       });
     }
   }
+
 
   Future<void> _forgotPassword() async {
     final email = emailController.text.trim();

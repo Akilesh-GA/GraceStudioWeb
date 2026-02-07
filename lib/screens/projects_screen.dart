@@ -5,8 +5,7 @@ class ProjectsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // THEME COLORS (updated)
-    final Color tColor = const Color(0xFF6D28D9); // Purple
+    final Color tColor = const Color(0xFF6D28D9);
     final Color neonPink = const Color(0xFFEC4899);
 
     final List<Map<String, String>> projects = [

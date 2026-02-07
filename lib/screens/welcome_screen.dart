@@ -113,7 +113,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     children: [
 
                       Text(
-                        "Grace Photo Studio",
+                        "Grace Studio",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 34,
