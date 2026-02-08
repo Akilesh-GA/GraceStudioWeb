@@ -300,3 +300,4 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
     );
   }
 }
+

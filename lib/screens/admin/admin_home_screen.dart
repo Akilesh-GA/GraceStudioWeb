@@ -5,12 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:grace_studio/screens/login_screen.dart';
-
-// 🔹 Admin module pages (create later or link existing)
 import 'admin_qr_screen.dart';
-// import 'admin_bookings_screen.dart';
-// import 'admin_notifications_screen.dart';
-// import 'admin_applications_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
