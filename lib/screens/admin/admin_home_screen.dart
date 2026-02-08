@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'admin_applications_page.dart';
+import 'admin_bookings_screen.dart';
 import 'package:grace_studio/screens/login_screen.dart';
 import 'admin_qr_screen.dart';
+import 'admin_dashboard_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -25,8 +26,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   final List<String> adminMenuItems = [
     "QR",
     "Bookings",
-    "Notifications",
     "Applications",
+    "Dashboard",
   ];
 
   final List<String> images = [
@@ -34,7 +35,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     "assets/images/img2.jpg",
     "assets/images/city1.jpg",
     "assets/images/marriage1.jpg",
-    "assets/images/birthday.jpg",
+    "assets/images/birthday1.jpg",
   ];
 
   Timer? _timer;
@@ -77,13 +78,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         screen = const AdminQRScreen();
         break;
       case "Bookings":
-        // screen = const AdminBookingsScreen();
+        screen = const AdminBookingsScreen();
         break;
-      case "Notifications":
-        // screen = const AdminNotificationsScreen();
+      case "Dashboard":
+        screen = const AdminDashboardScreen();
         break;
       case "Applications":
-        // screen = const AdminApplicationsScreen();
+        screen = const AdminApplicationsScreen();
         break;
     }
 

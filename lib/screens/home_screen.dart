@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     "assets/images/img2.jpg",
     "assets/images/city1.jpg",
     "assets/images/marriage1.jpg",
-    "assets/images/birthday.jpg",
+    "assets/images/birthday1.jpg",
   ];
 
   Timer? _timer;

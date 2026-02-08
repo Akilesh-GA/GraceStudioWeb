@@ -1,61 +1,385 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
-class AdminBookingsScreen extends StatelessWidget {
+const Color bgBlack = Color(0xFF0B0B0F);
+const Color purple = Color(0xFF9D4EDD);
+const Color neonPink = Color(0xFFFF2FB3);
+const Color textGrey = Color(0xFFB0B0C3);
+
+class AdminBookingsScreen extends StatefulWidget {
   const AdminBookingsScreen({super.key});
+
+  @override
+  State<AdminBookingsScreen> createState() => _AdminBookingsScreenState();
+}
+
+class _AdminBookingsScreenState extends State<AdminBookingsScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.05),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String formatTimestamp(Timestamp timestamp) {
+    return DateFormat('dd MMM yyyy • hh:mm a').format(timestamp.toDate());
+  }
+
+  Future<void> updateStatus(String docId, String status) async {
+    await FirebaseFirestore.instance
+        .collection('bookings')
+        .doc(docId)
+        .update({'status': status});
+  }
+
+  Color statusColor(String status) {
+    switch (status) {
+      case 'approved':
+        return Colors.greenAccent;
+      case 'rejected':
+        return neonPink;
+      default:
+        return Colors.orangeAccent;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF0F0C29), Color(0xFF302B63), Color(0xFF24243E)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-
-          Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  width: 900,
-                  padding: const EdgeInsets.all(30),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        "Bookings Management",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+      backgroundColor: bgBlack,
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fade,
+          child: SlideTransition(
+            position: _slide,
+            child: Padding(
+              padding: const EdgeInsets.all(30),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(26),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                  child: Container(
+                    padding: const EdgeInsets.all(30),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.08),
+                          Colors.white.withOpacity(0.03),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// TITLE
+                        ShaderMask(
+                          shaderCallback: (bounds) => const LinearGradient(
+                            colors: [purple, neonPink],
+                          ).createShader(bounds),
+                          child: const Text(
+                            "Bookings Management",
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "View and manage all customer bookings here.",
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Approve or reject customer bookings",
+                          style: TextStyle(color: textGrey),
+                        ),
+                        const SizedBox(height: 30),
+
+                        /// BOOKINGS
+                        Expanded(
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('bookings')
+                                .orderBy('createdAt', descending: true)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: neonPink,
+                                  ),
+                                );
+                              }
+
+                              if (!snapshot.hasData ||
+                                  snapshot.data!.docs.isEmpty) {
+                                return const Center(
+                                  child: Text(
+                                    "No bookings found",
+                                    style: TextStyle(color: textGrey),
+                                  ),
+                                );
+                              }
+
+                              final docs = snapshot.data!.docs;
+
+                              return ListView.separated(
+                                itemCount: docs.length,
+                                separatorBuilder: (_, __) =>
+                                const SizedBox(height: 22),
+                                itemBuilder: (context, index) {
+                                  final doc = docs[index];
+                                  final data =
+                                  doc.data() as Map<String, dynamic>;
+
+                                  return TweenAnimationBuilder<double>(
+                                    tween: Tween(begin: 0, end: 1),
+                                    duration:
+                                    Duration(milliseconds: 500 + index * 80),
+                                    curve: Curves.easeOutCubic,
+                                    builder: (context, value, child) {
+                                      return Transform.translate(
+                                        offset: Offset(0, 20 * (1 - value)),
+                                        child: Opacity(opacity: value, child: child),
+                                      );
+                                    },
+                                    child: _BookingCard(
+                                      data: data,
+                                      docId: doc.id,
+                                      formatTime: formatTimestamp,
+                                      updateStatus: updateStatus,
+                                      statusColor: statusColor,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
+}
+
+/// 🔹 BOOKING CARD
+class _BookingCard extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final String docId;
+  final String Function(Timestamp) formatTime;
+  final Function(String, String) updateStatus;
+  final Color Function(String) statusColor;
+
+  const _BookingCard({
+    required this.data,
+    required this.docId,
+    required this.formatTime,
+    required this.updateStatus,
+    required this.statusColor,
+  });
+
+  @override
+  State<_BookingCard> createState() => _BookingCardState();
+}
+
+class _BookingCardState extends State<_BookingCard> {
+  bool hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = widget.data['status'];
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withOpacity(0.6),
+            Colors.black.withOpacity(0.45),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white10),
+        boxShadow: [
+          BoxShadow(
+            color: hover
+                ? neonPink.withOpacity(0.25)
+                : purple.withOpacity(0.15),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => hover = true),
+        onExit: (_) => setState(() => hover = false),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// HEADER
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.data['name'],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        widget.statusColor(status).withOpacity(0.3),
+                        widget.statusColor(status).withOpacity(0.15),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    status.toUpperCase(),
+                    style: TextStyle(
+                      color: widget.statusColor(status),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+            const Divider(color: Colors.white12),
+
+            Wrap(
+              spacing: 40,
+              runSpacing: 12,
+              children: [
+                _info("Email", widget.data['email']),
+                _info("Phone", widget.data['phone']),
+                _info("Service", widget.data['service']),
+                _info("Preferred Date", widget.data['preferredDate']),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+            Text(widget.data['message'],
+                style: const TextStyle(color: textGrey)),
+
+            const SizedBox(height: 16),
+            Text(
+              "Created • ${widget.formatTime(widget.data['createdAt'])}",
+              style: const TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+
+            if (status == 'pending') ...[
+              const SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton(
+                    onPressed: () =>
+                        widget.updateStatus(widget.docId, 'rejected'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: neonPink,
+                      side: const BorderSide(color: neonPink),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text("Reject"),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () =>
+                        widget.updateStatus(widget.docId, 'approved'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 26, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [purple, neonPink],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 26, vertical: 14),
+                        child: Text(
+                          "Approve",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 🔹 INFO TILE
+Widget _info(String label, String value) {
+  return SizedBox(
+    width: 260,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        const SizedBox(height: 4),
+        Text(value,
+            style: const TextStyle(color: textGrey, fontSize: 14)),
+      ],
+    ),
+  );
 }
