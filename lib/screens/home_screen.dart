@@ -7,7 +7,7 @@ import 'about_screen.dart';
 import 'contact_screen.dart';
 import 'joinus_screen.dart';
 import 'projects_screen.dart';
-import 'dart:ui';
+import 'package:google_fonts/google_fonts.dart';
 import 'booking_screen_web.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -36,15 +36,20 @@ class _HomeScreenState extends State<HomeScreen> {
     "assets/images/nature.jpg",
     "assets/images/img2.jpg",
     "assets/images/city1.jpg",
-    "assets/images/marriage1.jpg",
     "assets/images/birthday1.jpg",
+    "assets/images/wedding.jpg",
   ];
 
   Timer? _timer;
 
+  // Shimmer animation controller
+  late final AnimationController _shineController;
+  late final Animation<double> _shineAnim;
+
   @override
   void initState() {
     super.initState();
+
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       _currentPage = (_currentPage + 1) % images.length;
       _pageController.animateToPage(
@@ -53,12 +58,23 @@ class _HomeScreenState extends State<HomeScreen> {
         curve: Curves.easeInOutCubic,
       );
     });
+
+    // Initialize shimmer animation safely
+    _shineController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+
+    _shineAnim = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _shineController, curve: Curves.linear),
+    );
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _pageController.dispose();
+    _shineController.dispose();
     super.dispose();
   }
 
@@ -124,12 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             SizedBox(
               height: screenHeight,
               child: Stack(
                 children: [
-
+                  // Background slider
                   PageView.builder(
                     controller: _pageController,
                     itemCount: images.length,
@@ -145,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
 
+                  // Gradient overlay
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -159,133 +175,137 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
+                  // Nav bar (no box effect)
                   Positioned(
                     top: 30,
                     left: 20,
                     right: 20,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(30)
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-
-                              Row(
-                                children: const [
-                                  Text(
-                                    "Grace Studio",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              Row(
-                                children: menuItems.map((item) {
-                                  final isHovered = _hoveredItem == item;
-                                  return MouseRegion(
-                                    onEnter: (_) => setState(() => _hoveredItem = item),
-                                    onExit: (_) => setState(() => _hoveredItem = ""),
-                                    child: GestureDetector(
-                                      onTap: () => _navigateTo(item),
-                                      child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 250),
-                                        margin: const EdgeInsets.symmetric(horizontal: 14),
-                                        padding: const EdgeInsets.symmetric(vertical: 6),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: isHovered
-                                                  ? const Color(0xFF9D4EDD)
-                                                  : Colors.transparent,
-                                              width: 2,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          item,
-                                          style: TextStyle(
-                                            color: isHovered
-                                                ? const Color(0xFF9D4EDD)
-                                                : Colors.white70,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-
-                              GestureDetector(
-                                onTap: _logout,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF7B2EFF),
-                                        Color(0xFFFF2EC4),
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0xFFFF2EC4).withOpacity(0.55),
-                                        blurRadius: 25,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(Icons.logout, size: 18, color: Colors.white),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "Logout",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text(
-                          "Moments That Last Forever",
-                          textAlign: TextAlign.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Grace Studio",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 42,
+                            fontSize: 26,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 16),
-                        Text(
+                        Row(
+                          children: menuItems.map((item) {
+                            final isHovered = _hoveredItem == item;
+                            return MouseRegion(
+                              onEnter: (_) => setState(() => _hoveredItem = item),
+                              onExit: (_) => setState(() => _hoveredItem = ""),
+                              child: GestureDetector(
+                                onTap: () => _navigateTo(item),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: isHovered
+                                            ? const Color(0xFF9D4EDD)
+                                            : Colors.transparent,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    item,
+                                    style: TextStyle(
+                                      color: isHovered
+                                          ? const Color(0xFFFF2EC4)
+                                          : Colors.white70,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        GestureDetector(
+                          onTap: _logout,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF7B2EFF),
+                                  Color(0xFFFF2EC4),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFFF2EC4).withOpacity(0.55),
+                                  blurRadius: 25,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.logout, size: 18, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Logout",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Center title with shimmer
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _shineAnim,
+                          builder: (context, child) {
+                            return ShaderMask(
+                              shaderCallback: (bounds) {
+                                return LinearGradient(
+                                  colors: const [
+                                    Color(0xFFFFFFFF),
+                                    Color(0xFFEC4899),
+                                    Color(0xFFFFFFFF)
+                                  ],
+                                  stops: [
+                                    (_shineAnim.value - 0.3).clamp(0.0, 1.0),
+                                    _shineAnim.value.clamp(0.0, 1.0),
+                                    (_shineAnim.value + 0.3).clamp(0.0, 1.0)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ).createShader(
+                                    Rect.fromLTWH(0, 0, bounds.width, bounds.height));
+                              },
+                              child: Text(
+                                "Welcome to Grace Studio",
+                                style: GoogleFonts.greatVibes(
+                                  fontSize: 100,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
                           "Wedding • Portrait • Events • Cinematic Shoots",
                           style: TextStyle(
                             color: Colors.white70,

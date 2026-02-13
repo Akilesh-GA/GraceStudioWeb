@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'admin_applications_page.dart';
@@ -7,6 +6,7 @@ import 'admin_bookings_screen.dart';
 import 'package:grace_studio/screens/login_screen.dart';
 import 'admin_qr_screen.dart';
 import 'admin_dashboard_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -22,7 +22,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   int _currentPage = 0;
   String _hoveredItem = "";
 
-  /// 🔹 ADMIN NAV ITEMS
   final List<String> adminMenuItems = [
     "QR",
     "Bookings",
@@ -34,8 +33,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     "assets/images/nature.jpg",
     "assets/images/img2.jpg",
     "assets/images/city1.jpg",
-    "assets/images/marriage1.jpg",
     "assets/images/birthday1.jpg",
+    "assets/images/wedding.jpg",
   ];
 
   Timer? _timer;
@@ -69,7 +68,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  /// 🔹 ADMIN NAVIGATION
   void _navigateTo(String page) {
     Widget? screen;
 
@@ -121,12 +119,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Column(
           children: [
 
-            /// 🔹 HERO SECTION
+            /// HERO SECTION
             SizedBox(
               height: screenHeight,
               child: Stack(
                 children: [
 
+                  // Background slider
                   PageView.builder(
                     controller: _pageController,
                     itemCount: images.length,
@@ -142,6 +141,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     },
                   ),
 
+                  // Gradient overlay
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -156,135 +156,114 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     ),
                   ),
 
-                  /// 🔹 ADMIN NAVBAR
+                  /// ADMIN NAVBAR (no box)
                   Positioned(
                     top: 30,
                     left: 20,
                     right: 20,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
 
-                              /// LOGO
-                              const Text(
-                                "Grace Studio",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              /// ADMIN MENU
-                              Row(
-                                children: adminMenuItems.map((item) {
-                                  final isHovered = _hoveredItem == item;
-                                  return MouseRegion(
-                                    onEnter: (_) =>
-                                        setState(() => _hoveredItem = item),
-                                    onExit: (_) =>
-                                        setState(() => _hoveredItem = ""),
-                                    child: GestureDetector(
-                                      onTap: () => _navigateTo(item),
-                                      child: AnimatedContainer(
-                                        duration:
-                                        const Duration(milliseconds: 250),
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 14),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 6),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: isHovered
-                                                  ? const Color(0xFF9D4EDD)
-                                                  : Colors.transparent,
-                                              width: 2,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          item,
-                                          style: TextStyle(
-                                            color: isHovered
-                                                ? const Color(0xFF9D4EDD)
-                                                : Colors.white70,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-
-                              /// LOGOUT
-                              GestureDetector(
-                                onTap: _logout,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF7B2EFF),
-                                        Color(0xFFFF2EC4),
-                                      ],
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.logout,
-                                          size: 18, color: Colors.white),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "Logout",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
+                        /// LOGO
+                        Text(
+                          "Grace Studio",
+                          style: GoogleFonts.montserrat(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
+
+                        /// ADMIN MENU
+                        Row(
+                          children: adminMenuItems.map((item) {
+                            final isHovered = _hoveredItem == item;
+                            return MouseRegion(
+                              onEnter: (_) => setState(() => _hoveredItem = item),
+                              onExit: (_) => setState(() => _hoveredItem = ""),
+                              child: GestureDetector(
+                                onTap: () => _navigateTo(item),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: isHovered
+                                            ? const Color(0xFF9D4EDD)
+                                            : Colors.transparent,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    item,
+                                    style: GoogleFonts.montserrat(
+                                      color: isHovered
+                                          ? const Color(0xFF9D4EDD)
+                                          : Colors.white70,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        /// LOGOUT
+                        GestureDetector(
+                          onTap: _logout,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF7B2EFF),
+                                  Color(0xFFFF2EC4),
+                                ],
+                              ),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.logout, size: 18, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Logout",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  /// 🔹 ADMIN TITLE
-                  const Center(
+                  /// ADMIN TITLE
+                  Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           "Admin Control Panel",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 42,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           "Manage bookings • QR • notifications • applications",
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.white70,
                             fontSize: 18,
                           ),
@@ -296,7 +275,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               ),
             ),
 
-            /// 🔹 FOOTER
+            /// FOOTER
             Container(
               padding: const EdgeInsets.symmetric(vertical: 40),
               child: const Text(

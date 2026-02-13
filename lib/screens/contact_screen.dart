@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color cardBlack = Color(0xFF14141C);
@@ -41,7 +42,6 @@ class ContactUsScreen extends StatelessWidget {
                   height: 1.6,
                 ),
               ),
-
               const SizedBox(height: 40),
 
               const Text(
@@ -59,37 +59,79 @@ class ContactUsScreen extends StatelessWidget {
                   ServiceCard(
                     icon: Icons.camera_alt,
                     title: "Photography",
-                    description: "We breathe photography. Our team is passionate, young, and creative.",
+                    description:
+                    "We breathe photography. Our team is passionate, young, and creative.",
                   ),
                   SizedBox(width: 70),
                   ServiceCard(
                     icon: Icons.videocam,
                     title: "Video",
-                    description: "Cinematic wedding and event videos are our greatest strength.",
+                    description:
+                    "Cinematic wedding and event videos are our greatest strength.",
                   ),
                   SizedBox(width: 70),
                   ServiceCard(
                     icon: Icons.brush,
                     title: "Editing",
-                    description: "Experienced editors delivering industry-standard visual quality.",
+                    description:
+                    "Experienced editors delivering industry-standard visual quality.",
                   ),
                   SizedBox(width: 70),
                   ServiceCard(
                     icon: Icons.camera_alt,
                     title: "Drone Photography",
-                    description: "capturing breathtaking aerial images and video that tell your story from an unforgettable perspective",
+                    description:
+                    "Capturing breathtaking aerial images and video that tell your story from an unforgettable perspective",
                   ),
                   SizedBox(width: 70),
                   ServiceCard(
                     icon: Icons.camera_alt,
                     title: "Art Works",
-                    description: "We live for the art of sculpture. Our team is passionate, young, and creative",
+                    description:
+                    "We live for the art of sculpture. Our team is passionate, young, and creative",
                   ),
                 ],
               ),
 
               const SizedBox(height: 60),
 
+              // ================= QR CODE SECTION =================
+              const Text(
+                "Find Us Here",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(12), // space around QR
+                  decoration: BoxDecoration(
+                    color: Colors.white, // white background
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: QrImageView(
+                    data:
+                    "https://www.google.com/maps/dir/11.0807196,77.2853513/Grace+studio,+C167,+TNP+Nagar,+Ashokapuram,+Thudiyalur,+Tamil+Nadu+641034",
+                    version: QrVersions.auto,
+                    size: 180,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 60),
+
+              // ================= MESSAGE BOX =================
               const Text(
                 "Send Us a Message",
                 style: TextStyle(
@@ -122,14 +164,12 @@ class ContactUsScreen extends StatelessWidget {
                         icon: Icons.person_outline,
                       ),
                       const SizedBox(height: 18),
-
                       ContactInputField(
                         controller: emailController,
                         label: "Email",
                         icon: Icons.email_outlined,
                       ),
                       const SizedBox(height: 18),
-
                       ContactInputField(
                         controller: messageController,
                         label: "Message",
@@ -137,7 +177,6 @@ class ContactUsScreen extends StatelessWidget {
                         maxLines: 5,
                       ),
                       const SizedBox(height: 30),
-
                       GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -185,6 +224,7 @@ class ContactUsScreen extends StatelessWidget {
 
               const SizedBox(height: 60),
 
+              // ================= CONTACT INFO =================
               const ContactDetailRow(
                 icon: Icons.location_on_outlined,
                 text:

@@ -1,57 +1,59 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
+
   @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnim;
 
-  late AnimationController _controller;
-  late Animation<double> fadeAnim;
-  late Animation<Offset> slideAnim;
+  late AnimationController _shineController;
+  late Animation<double> _shineAnim;
 
   final PageController _pageController = PageController();
   int _currentPage = 0;
   Timer? _timer;
 
-  final Color purple = const Color(0xFF6D28D9);
   final Color neonPink = const Color(0xFFEC4899);
 
   final List<String> images = [
     "assets/images/nature.jpg",
     "assets/images/img2.jpg",
     "assets/images/city1.jpg",
-    "assets/images/marriage1.jpg",
-    "assets/images/birthday.jpg",
+    "assets/images/birthday1.jpg",
+    "assets/images/wedding.jpg",
   ];
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
+    // Fade animation for screen
+    _fadeController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _fadeAnim =
+        CurvedAnimation(parent: _fadeController, curve: Curves.easeOut);
+    _fadeController.forward();
+
+    // Shine animation for title
+    _shineController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: false);
+    _shineAnim = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _shineController, curve: Curves.linear),
     );
 
-    fadeAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    _controller.forward();
-
+    // Background slider timer
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       _currentPage = (_currentPage + 1) % images.length;
       _pageController.animateToPage(
@@ -64,7 +66,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _fadeController.dispose();
+    _shineController.dispose();
     _pageController.dispose();
     _timer?.cancel();
     super.dispose();
@@ -74,9 +77,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: FadeTransition(
-        opacity: fadeAnim,
+        opacity: _fadeAnim,
         child: Stack(
           children: [
+            // Background slider
             PageView.builder(
               controller: _pageController,
               itemCount: images.length,
@@ -90,6 +94,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               },
             ),
 
+            // Gradient overlay
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -103,64 +108,87 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
 
+            // Content
             SafeArea(
               child: Center(
-                child: SlideTransition(
-                  position: slideAnim,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Shiny title with Google Font
+                    AnimatedBuilder(
+                      animation: _shineAnim,
+                      builder: (context, child) {
+                        return ShaderMask(
+                          shaderCallback: (bounds) {
+                            return LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: const [
+                                Colors.white70,
+                                Colors.white,
+                                Colors.white70
+                              ],
+                              stops: [
+                                _shineAnim.value - 0.3,
+                                _shineAnim.value,
+                                _shineAnim.value + 0.3
+                              ],
+                            ).createShader(
+                              Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                            );
+                          },
+                          child: Text(
+                            "Grace Studio",
+                            style: GoogleFonts.greatVibes(
+                              fontSize: 100,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
 
-                      Text(
-                        "Grace Studio",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.bold,
-                          color: neonPink,
-                          letterSpacing: 1.3,
-                        ),
+                    const SizedBox(height: 12),
+
+                    const Text(
+                      "Elegance in Every Frame",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white70,
                       ),
+                    ),
 
-                      const SizedBox(height: 14),
+                    const SizedBox(height: 60),
 
-                      Text(
-                        "Book shoots • View portfolio • Manage gallery",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
-                      ),
+                    _buildButton(
+                      label: "Login",
+                      gradient: true,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const LoginScreen()),
+                        );
+                      },
+                    ),
 
-                      const SizedBox(height: 50),
+                    const SizedBox(height: 12),
 
-                      _buildButton(
-                        label: "Login",
-                        gradient: true,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => LoginScreen()),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      _buildButton(
-                        label: "Create an Account",
-                        border: true,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => RegisterScreen()),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                    _buildButton(
+                      label: "Create an Account",
+                      border: true,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => RegisterScreen()),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -170,31 +198,34 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
+  // Smaller buttons
   Widget _buildButton({
     required String label,
     required VoidCallback onPressed,
     bool gradient = false,
     bool border = false,
   }) {
+    final Color neonPink = const Color(0xFFEC4899);
+    final Color purple = const Color(0xFF6D28D9);
+
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        height: 55,
-        width: 260,
+        height: 45, // smaller height
+        width: 200, // smaller width
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           border: border ? Border.all(color: neonPink, width: 2) : null,
           gradient: gradient
               ? const LinearGradient(
-            colors: [Color(0xFF6D28D9), Color(0xFFEC4899)],
-          )
+              colors: [Color(0xFF6D28D9), Color(0xFFEC4899)])
               : null,
           boxShadow: gradient
               ? [
             BoxShadow(
               color: neonPink.withOpacity(0.6),
-              blurRadius: 25,
-              offset: const Offset(0, 10),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ]
               : [],
@@ -203,7 +234,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: border ? neonPink : Colors.white,
             ),

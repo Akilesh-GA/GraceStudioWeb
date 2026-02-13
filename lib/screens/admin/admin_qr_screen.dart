@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -18,16 +17,11 @@ class AdminQRScreen extends StatefulWidget {
 }
 
 class _AdminQRScreenState extends State<AdminQRScreen> {
-  // DEVICE UPLOAD
-  List<Uint8List> _deviceImages = [];
-  // URL UPLOAD
-  List<String> _urlImages = [];
-
+  final List<Uint8List> _deviceImages = [];
   String? _qrData;
   bool _loading = false;
-  final urlController = TextEditingController();
 
-  /// 📸 Pick Multiple Images from Device
+  /// 📸 Pick Images from Laptop / PC
   Future<void> _pickDeviceImages() async {
     final picker = ImagePicker();
     final List<XFile>? images = await picker.pickMultiImage();
@@ -36,39 +30,21 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
 
     setState(() => _loading = true);
 
-    List<Uint8List> bytesList = [];
-    List<String> urlList = [];
+    _deviceImages.clear();
 
     for (var image in images) {
       final bytes = await image.readAsBytes();
-      bytesList.add(bytes);
-      // Simulate a local URL using base64 for QR
-      urlList.add(base64Encode(bytes));
+      _deviceImages.add(bytes);
     }
 
+    /// ✅ SAFE QR INPUT (SHORT STRING)
+    final String imageId =
+        "IMG_${DateTime.now().millisecondsSinceEpoch}";
+
     setState(() {
-      _deviceImages = bytesList;
-      _qrData = jsonEncode(urlList);
+      _qrData = imageId; // 👈 QR contains ONLY ID
       _loading = false;
     });
-  }
-
-  /// 🔗 Add Image URL
-  void _addImageUrl() {
-    final url = urlController.text.trim();
-    if (url.isEmpty) return;
-
-    setState(() {
-      _urlImages.add(url);
-      _qrData = jsonEncode(_urlImages);
-      urlController.clear();
-    });
-  }
-
-  @override
-  void dispose() {
-    urlController.dispose();
-    super.dispose();
   }
 
   @override
@@ -95,6 +71,7 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                /// 🔹 TITLE
                 const Text(
                   "QR Image Generator",
                   style: TextStyle(
@@ -105,21 +82,23 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  "Generate QR codes for albums and photos",
+                  "Upload images and generate QR for users to scan",
                   style: TextStyle(color: textGrey),
                 ),
 
                 const SizedBox(height: 30),
 
-                /// ----------------- DEVICE UPLOAD MODULE -----------------
+                /// 🔹 DEVICE UPLOAD
                 const Text(
                   "Device Upload",
                   style: TextStyle(
-                      color: neonPink,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                    color: neonPink,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
+
                 Container(
                   height: 150,
                   decoration: BoxDecoration(
@@ -138,7 +117,7 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: _deviceImages.length,
                     itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(18),
                         child: Image.memory(
@@ -150,12 +129,14 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+
+                const SizedBox(height: 16),
+
                 GestureDetector(
                   onTap: _loading ? null : _pickDeviceImages,
                   child: Container(
                     height: 50,
-                    width: 200,
+                    width: 220,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
                       gradient: const LinearGradient(
@@ -168,100 +149,17 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
                           : const Text(
                         "Select Images",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                /// ----------------- URL UPLOAD MODULE -----------------
-                const Text(
-                  "URL Upload",
-                  style: TextStyle(
-                      color: neonPink,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: urlController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: "Enter image URL",
-                          hintStyle: const TextStyle(color: textGrey),
-                          filled: true,
-                          fillColor: cardBlack,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: _addImageUrl,
-                      child: Container(
-                        height: 50,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          gradient: const LinearGradient(
-                            colors: [purple, neonPink],
-                          ),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "Add URL",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-                if (_urlImages.isNotEmpty)
-                  Container(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _urlImages.length,
-                      itemBuilder: (context, index) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          width: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: Colors.white12),
-                          ),
-                          child: Center(
-                            child: Text(
-                              _urlImages[index],
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 12),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
+                ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
 
-                /// ----------------- QR CODE -----------------
+                /// 🔹 QR CODE SECTION
                 if (_qrData != null)
                   Column(
                     children: [
@@ -269,26 +167,26 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
                         "Generated QR Code",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(22),
                         ),
                         child: QrImageView(
                           data: _qrData!,
-                          size: 200,
+                          size: 220,
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        "Scan to view images",
-                        style: TextStyle(color: textGrey),
+                      Text(
+                        "QR ID: $_qrData",
+                        style: const TextStyle(color: textGrey),
                       ),
                     ],
                   ),
@@ -300,4 +198,3 @@ class _AdminQRScreenState extends State<AdminQRScreen> {
     );
   }
 }
-
