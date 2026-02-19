@@ -15,9 +15,14 @@ class AboutScreen extends StatefulWidget {
 
 class _AboutScreenState extends State<AboutScreen>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _controller;
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final messageController = TextEditingController();
 
   @override
   void initState() {
@@ -45,6 +50,9 @@ class _AboutScreenState extends State<AboutScreen>
   @override
   void dispose() {
     _controller.dispose();
+    nameController.dispose();
+    emailController.dispose();
+    messageController.dispose();
     super.dispose();
   }
 
@@ -62,7 +70,7 @@ class _AboutScreenState extends State<AboutScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// TITLE
+
                   const Text(
                     "About Grace Studio",
                     style: TextStyle(
@@ -83,136 +91,59 @@ class _AboutScreenState extends State<AboutScreen>
                       height: 1.6,
                     ),
                   ),
-                  const SizedBox(height: 40),
+
+                  const SizedBox(height: 60),
 
                   const Text(
-                    "Our Mission",
+                    "Send Us a Message",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "To create meaningful visuals that capture emotions, preserve memories, and tell stories that last forever.\n"
-                        "Driven by passion and creativity, we transform fleeting moments into timeless art.\n"
-                        "Every frame we capture reflects our commitment to authenticity, excellence, and storytelling that lives beyond time.",
-                    style: TextStyle(
-                      color: textGrey,
-                      fontSize: 16,
-                      height: 1.6,
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: nameController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: "Full Name",
+                      labelStyle: TextStyle(color: textGrey),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 15),
 
-                  const Text(
-                    "Our Journey",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                  TextField(
+                    controller: emailController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: "Email",
+                      labelStyle: TextStyle(color: textGrey),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 15),
 
-                  Container(
-                    height: 460,
-                    decoration: BoxDecoration(
-                      color: mapBg,
-                      borderRadius: BorderRadius.circular(24),
-                      gradient: LinearGradient(
-                        colors: [
-                          mapBg,
-                          mapBg.withOpacity(0.85),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: AnimatedBuilder(
-                            animation: _controller,
-                            builder: (_, __) {
-                              return CustomPaint(
-                                painter: JourneyPathPainter(
-                                  glow: _controller.value,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        const Positioned(
-                          left: 40,
-                          bottom: 80,
-                          child: MapMarker(
-                            title: "The Beginning",
-                            subtitle:
-                            "Started in a small photo studio in Tiruppur,\n"
-                                "without a name board or recognition—\n"
-                                "just a camera, determination, and a dream.",
-                            color: neonPink,
-                          ),
-                        ),
-
-                        const Positioned(
-                          left: 360,
-                          top: 160,
-                          child: MapMarker(
-                            title: "Learning",
-                            subtitle:
-                            "Every shoot became a classroom—\n"
-                                "learning lighting, angles, editing,\n"
-                                "and storytelling through practice.",
-                            color: purple,
-                          ),
-                        ),
-
-                        const Positioned(
-                          left: 650,
-                          top: 120,
-                          child: MapMarker(
-                            title: "Expansion",
-                            subtitle:
-                            "Services expanded, equipment upgraded,\n"
-                                "and a clear vision took shape—\n"
-                                "turning passion into identity.",
-                            color: neonPink,
-                          ),
-                        ),
-
-                        const Positioned(
-                          left: 920,
-                          top: 150,
-                          child: MapMarker(
-                            title: "Growth",
-                            subtitle:
-                            "Trust built through consistent quality,\n"
-                                "emotional storytelling, and dedication—\n"
-                                "clients became long-term family.",
-                            color: purple,
-                          ),
-                        ),
-
-                        const Positioned(
-                          right: 40,
-                          bottom: 100,
-                          child: MapMarker(
-                            title: "Destination",
-                            subtitle:
-                            "Creating timeless visual stories\n"
-                                "with a global vision—where every\n"
-                                "frame preserves lasting memories.",
-                            color: neonPink,
-                          ),
-                        ),
-
-                      ],
+                  TextField(
+                    controller: messageController,
+                    maxLines: 4,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: "Message",
+                      labelStyle: TextStyle(color: textGrey),
                     ),
                   ),
+                  const SizedBox(height: 20),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: neonPink,
+                    ),
+                    onPressed: () {},
+                    child: const Text("Send Message"),
+                  ),
+
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -221,71 +152,4 @@ class _AboutScreenState extends State<AboutScreen>
       ),
     );
   }
-}
-
-class MapMarker extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Color color;
-
-  const MapMarker({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(Icons.location_on, size: 36, color: color),
-        const SizedBox(height: 4),
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          subtitle,
-          style: const TextStyle(
-            color: textGrey,
-            fontSize: 12,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}
-
-class JourneyPathPainter extends CustomPainter {
-  final double glow;
-
-  JourneyPathPainter({required this.glow});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = purple.withOpacity(0.4 + glow * 0.4)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    final path = Path();
-    path.moveTo(60, size.height - 100);
-    path.quadraticBezierTo(
-      size.width / 2,
-      40,
-      size.width - 60,
-      size.height - 120,
-    );
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

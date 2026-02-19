@@ -7,6 +7,7 @@ import 'package:grace_studio/screens/login_screen.dart';
 import 'admin_qr_screen.dart';
 import 'admin_dashboard_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'admin_portfolio_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -24,6 +25,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   final List<String> adminMenuItems = [
     "QR",
+    "Portfolio",
     "Bookings",
     "Applications",
     "Dashboard",
@@ -74,6 +76,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     switch (page) {
       case "QR":
         screen = const AdminQRScreen();
+        break;
+      case "Portfolio":
+        screen = const ProjectsScreen();
         break;
       case "Bookings":
         screen = const AdminBookingsScreen();
