@@ -26,6 +26,8 @@ dependencies:
   google_fonts: ^8.0.1
   url_launcher: ^6.3.2
   http: ^1.6.0
+  payu_in_web: ^1.1.0
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'portfolio_data.dart';
+import 'package:grace_studio/models/portfolio_data.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});

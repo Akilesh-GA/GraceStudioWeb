@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'portfolio_data.dart';
+import 'package:grace_studio/models/portfolio_data.dart';
 
 class ProjectsScreen extends StatelessWidget {
   const ProjectsScreen({super.key});
