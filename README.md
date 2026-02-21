@@ -73,5 +73,5 @@ HTML/JS: Web payment integration for Razorpay
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/grace-studio.git
-cd grace-studio
+git clone https://github.com/Akilesh-GA/GraceStudioWeb.git
+cd GraceStudioWeb
