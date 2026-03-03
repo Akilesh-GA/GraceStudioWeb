@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart'; // Added for title style
 import '../widgets/booking_input_field.dart';
-import 'package:payu_in_web/payu_in_web.dart'; // Add this package
-import 'package:crypto/crypto.dart'; // For Hash generation
+import 'package:payu_in_web/payu_in_web.dart';
+import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
 const Color bgBlack = Color(0xFF0B0B0F);
@@ -35,7 +36,7 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
   int bookingAmount = 1; // Test amount
   String errorMessage = "";
 
-  // TEST CREDENTIALS (Use your own from PayU Dashboard for specific testing)
+  // TEST CREDENTIALS
   final String merchantKey = "ORvXCP";
   final String merchantSalt = "7Sj8I4ITXjyQ5hUS8gBjkamMBKD5ZO3n";
 
@@ -60,12 +61,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
     super.dispose();
   }
 
-  // PayU requires a SHA512 hash: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||salt
-  String _generatePayUHash(String txnId, String amount, String productName, String firstName, String email) {
-    var bytes = utf8.encode("$merchantKey|$txnId|$amount|$productName|$firstName|$email|||||||||||$merchantSalt");
-    return sha512.convert(bytes).toString();
-  }
-
   void _openPayUWeb() {
     if (nameController.text.isEmpty || phoneController.text.isEmpty || selectedService == null || dateController.text.isEmpty) {
       setState(() => errorMessage = "Please fill all required fields");
@@ -78,7 +73,6 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
     final String firstName = nameController.text;
     final String email = emailController.text;
 
-    // Launch PayU Web Checkout
     try {
       FlutterPayuWeb.checkout(
         merchantKey: merchantKey,
@@ -90,9 +84,9 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
         lastName: "",
         email: email,
         phone: phoneController.text,
-        sUrl: "https://cbjs.payu.in/sdk/success", // Standard PayU Test Success URL
-        fUrl: "https://cbjs.payu.in/sdk/failure", // Standard PayU Test Failure URL
-        launchNewTab: true, // Recommended for Web to avoid iframe issues
+        sUrl: "https://cbjs.payu.in/sdk/success",
+        fUrl: "https://cbjs.payu.in/sdk/failure",
+        launchNewTab: true,
       );
     } catch (e) {
       setState(() => errorMessage = "Payment failed to initialize: $e");
@@ -123,6 +117,17 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgBlack,
+      // AppBar added for brand consistency
+      appBar: AppBar(
+        backgroundColor: bgBlack,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: Text(
+          "Grace Studio",
+          style: GoogleFonts.greatVibes(fontSize: 28, color: Colors.white70),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: FadeTransition(
@@ -130,18 +135,36 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
             child: SlideTransition(
               position: slideAnim,
               child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Book a Service", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
-                    const SizedBox(height: 20),
+                    // Main Heading
+                    const Text(
+                      "Book a Service",
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    const SizedBox(height: 8),
+                    // Subtitle
+                    const Text(
+                      "Reserve your slot for a premium creative experience",
+                      style: TextStyle(fontSize: 15, color: textGrey, letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 35),
+
                     Container(
                       width: 340,
                       padding: const EdgeInsets.all(25),
                       decoration: BoxDecoration(
                         color: cardBlack,
                         borderRadius: BorderRadius.circular(25),
-                        boxShadow: [BoxShadow(blurRadius: 30, color: neonPink.withOpacity(0.25))],
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 30,
+                              offset: const Offset(0, 10),
+                              color: neonPink.withOpacity(0.15)
+                          )
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -158,7 +181,11 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
                               value: selectedService,
                               dropdownColor: cardBlack,
                               icon: const Icon(Icons.keyboard_arrow_down, color: neonPink),
-                              decoration: const InputDecoration(border: InputBorder.none, labelText: "Service", labelStyle: TextStyle(color: textGrey)),
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: "Service",
+                                  labelStyle: TextStyle(color: textGrey)
+                              ),
                               style: const TextStyle(color: Colors.white),
                               items: services.map((service) => DropdownMenuItem(value: service, child: Text(service))).toList(),
                               onChanged: (value) => setState(() => selectedService = value),
@@ -173,23 +200,37 @@ class _BookingScreenWebState extends State<BookingScreenWeb>
                           ),
                           const SizedBox(height: 15),
                           BookingInputField(controller: messageController, label: "Additional Details", icon: Icons.notes, maxLines: 3),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 25),
                           GestureDetector(
                             onTap: _openPayUWeb,
                             child: Container(
                               height: 55,
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [purple, neonPink]),
-                                borderRadius: BorderRadius.circular(30),
+                                  gradient: const LinearGradient(colors: [purple, neonPink]),
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: neonPink.withOpacity(0.3),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
+                                    )
+                                  ]
                               ),
                               child: const Center(
-                                child: Text("Submit & Pay", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                child: Text(
+                                    "Submit & Pay",
+                                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
+                                ),
                               ),
                             ),
                           ),
                           if (errorMessage.isNotEmpty) ...[
-                            const SizedBox(height: 10),
-                            Text(errorMessage, style: const TextStyle(color: Colors.redAccent)),
+                            const SizedBox(height: 15),
+                            Text(
+                                errorMessage,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.redAccent, fontSize: 13)
+                            ),
                           ]
                         ],
                       ),

@@ -28,6 +28,10 @@ dependencies:
   http: ^1.6.0
   payu_in_web: ^1.1.0
   crypto: ^3.0.7
+  photofilters: ^3.0.1
+  image: ^3.3.0
+  path_provider: ^2.1.2
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:

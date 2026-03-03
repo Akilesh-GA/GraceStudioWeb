@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'login_screen.dart';
-import 'about_screen.dart';
 import 'contact_screen.dart';
 import 'joinus_screen.dart';
 import 'projects_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'booking_screen_payu.dart';
+import 'editing_screen.dart';
+import 'support_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,11 +26,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   String _hoveredItem = "";
 
   final List<String> menuItems = [
-    "About",
     "Portfolio",
-    "Contact Us",
     "Booking",
+    "Editor",
     "Join Us",
+    "Contact Us",
+    "Support"
   ];
 
   final List<String> images = [
@@ -42,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Timer? _timer;
 
-  // Shimmer animation controller
   late final AnimationController _shineController;
   late final Animation<double> _shineAnim;
 
@@ -51,15 +52,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.initState();
 
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      _currentPage = (_currentPage + 1) % images.length;
-      _pageController.animateToPage(
-        _currentPage,
-        duration: const Duration(milliseconds: 900),
-        curve: Curves.easeInOutCubic,
-      );
+      if (_pageController.hasClients) {
+        _currentPage = (_currentPage + 1) % images.length;
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeInOutCubic,
+        );
+      }
     });
 
-    // Initialize shimmer animation safely
     _shineController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -89,23 +91,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   void _navigateTo(String page) {
     Widget? screen;
-
     switch (page) {
-      case "About":
-        screen = const AboutScreen();
-        break;
-      case "Portfolio":
-        screen = const ProjectsScreen();
-        break;
-      case "Contact Us":
-        screen = const ContactUsScreen();
-        break;
-      case "Booking":
-        screen = const BookingScreenWeb();
-        break;
-      case "Join Us":
-        screen = JoinUsScreen();
-        break;
+      case "Portfolio": screen = const ProjectsScreen(); break;
+      case "Contact Us": screen = const ContactUsScreen(); break;
+      case "Editor": screen = const EditingStudioScreen(); break;
+      case "Booking": screen = const BookingScreenWeb(); break;
+      case "Join Us": screen = JoinUsScreen(); break;
+      case "Support": screen = SupportScreen(); break;
     }
 
     if (screen != null) {
@@ -140,11 +132,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // --- SECTION 1: HERO HEADER ---
             SizedBox(
               height: screenHeight,
               child: Stack(
                 children: [
-                  // Background slider
                   PageView.builder(
                     controller: _pageController,
                     itemCount: images.length,
@@ -159,8 +151,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       );
                     },
                   ),
-
-                  // Gradient overlay
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -174,12 +164,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-
-                  // Nav bar (no box effect)
                   Positioned(
-                    top: 30,
-                    left: 20,
-                    right: 20,
+                    top: 30, left: 20, right: 20,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -206,9 +192,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
-                                        color: isHovered
-                                            ? const Color(0xFF9D4EDD)
-                                            : Colors.transparent,
+                                        color: isHovered ? const Color(0xFF9D4EDD) : Colors.transparent,
                                         width: 2,
                                       ),
                                     ),
@@ -216,9 +200,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   child: Text(
                                     item,
                                     style: TextStyle(
-                                      color: isHovered
-                                          ? const Color(0xFFFF2EC4)
-                                          : Colors.white70,
+                                      color: isHovered ? const Color(0xFFFF2EC4) : Colors.white70,
                                       fontSize: 16,
                                     ),
                                   ),
@@ -234,30 +216,24 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF7B2EFF),
-                                  Color(0xFFFF2EC4),
-                                ],
+                                colors: [Color(0xFF7B2EFF), Color(0xFFFF2EC4)],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFFFF2EC4).withOpacity(0.55),
+                                  color: const Color(0xFFFF2EC4).withOpacity(0.55),
                                   blurRadius: 25,
                                   spreadRadius: 1,
                                 ),
                               ],
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 Icon(Icons.logout, size: 18, color: Colors.white),
                                 SizedBox(width: 8),
                                 Text(
                                   "Logout",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -266,8 +242,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ],
                     ),
                   ),
-
-                  // Center title with shimmer
                   Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -278,11 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             return ShaderMask(
                               shaderCallback: (bounds) {
                                 return LinearGradient(
-                                  colors: const [
-                                    Color(0xFFFFFFFF),
-                                    Color(0xFFEC4899),
-                                    Color(0xFFFFFFFF)
-                                  ],
+                                  colors: const [Color(0xFFFFFFFF), Color(0xFFEC4899), Color(0xFFFFFFFF)],
                                   stops: [
                                     (_shineAnim.value - 0.3).clamp(0.0, 1.0),
                                     _shineAnim.value.clamp(0.0, 1.0),
@@ -290,11 +260,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   ],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
-                                ).createShader(
-                                    Rect.fromLTWH(0, 0, bounds.width, bounds.height));
+                                ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height));
                               },
                               child: Text(
                                 "Welcome to Grace Studio",
+                                textAlign: TextAlign.center,
                                 style: GoogleFonts.greatVibes(
                                   fontSize: 100,
                                   fontWeight: FontWeight.bold,
@@ -307,9 +277,52 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         const SizedBox(height: 16),
                         const Text(
                           "Wedding • Portrait • Events • Cinematic Shoots",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 18,
+                          style: TextStyle(color: Colors.white70, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // --- SECTION 2: ABOUT SECTION (No Box/Border) ---
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
+              color: Colors.black,
+              child: Column(
+                children: [
+                  Text(
+                    "Our Story",
+                    style: GoogleFonts.greatVibes(
+                      fontSize: 55,
+                      color: const Color(0xFFFF2EC4),
+                    ),
+                  ),
+                  const SizedBox(height: 50),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 900),
+                    child: Column(
+                      children: [
+                        Text(
+                          "At Grace Studio, we believe every moment is a masterpiece waiting to be captured with elegance and precision.",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 20,
+                            height: 1.8,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          "We blend artistic vision with cutting-edge technology to deliver timeless visuals that stay with you forever.",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white54,
+                            fontSize: 20,
+                            height: 1.8,
                           ),
                         ),
                       ],
@@ -319,17 +332,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
 
+            // --- SECTION 3: FOOTER ---
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 50),
+              padding: const EdgeInsets.symmetric(vertical: 60),
               color: Colors.black,
               child: Column(
                 children: [
                   const Text(
                     "Grace Studio",
-                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -339,10 +353,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _socialIcon(FontAwesomeIcons.youtube),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   const Text(
                     "© 2025 Grace Studio. All Rights Reserved",
-                    style: TextStyle(color: Colors.white54),
+                    style: TextStyle(color: Colors.white54, fontSize: 14),
                   ),
                 ],
               ),
@@ -359,18 +373,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: const Color(0xFFFF2EC4)),
+        border: Border.all(color: const Color(0xFFFF2EC4).withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF9D4EDD).withOpacity(0.6),
-            blurRadius: 12,
+            color: const Color(0xFF9D4EDD).withOpacity(0.3),
+            blurRadius: 15,
           ),
         ],
       ),
       child: FaIcon(
         icon,
         color: const Color(0xFFFF2EC4),
-        size: 18,
+        size: 20,
       ),
     );
   }

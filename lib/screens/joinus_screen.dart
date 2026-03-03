@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:google_fonts/google_fonts.dart'; // Ensure this is imported
 
 const Color bgBlack = Color(0xFF0B0B0F);
 const Color purple = Color(0xFF7B2EFF);
@@ -72,6 +73,17 @@ class _JoinUsScreenState extends State<JoinUsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgBlack,
+      // Added AppBar to match Support Screen
+      appBar: AppBar(
+        backgroundColor: bgBlack,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: Text(
+          "Grace Studio",
+          style: GoogleFonts.greatVibes(fontSize: 28, color: Colors.white70),
+        ),
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -212,6 +224,7 @@ class _JoinUsScreenState extends State<JoinUsScreen>
                               ],
                             ),
                           ),
+                          const SizedBox(height: 20), // Added bottom padding
                         ],
                       ),
                     ),
@@ -267,6 +280,8 @@ class _JoinUsScreenState extends State<JoinUsScreen>
         "createdAt": FieldValue.serverTimestamp(),
         "status": "pending",
       });
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Application submitted successfully")),
