@@ -1,77 +1,87 @@
-# Grace Studio - Booking & Payment App
+# 📸 Grace Studio | Professional Media Booking App
 
-Grace Studio is a Flutter-based cross-platform application for booking photography, videography, and related services. It provides a seamless experience for users to select services, book slots, make payments, and track their bookings. The application is integrated with **Razorpay** for secure online payments and includes a modern, responsive UI optimized for both mobile and web platforms.
+[![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=flat&logo=Flutter&logoColor=white)](https://flutter.dev)
+[![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=flat&logo=razorpay&logoColor=3399FF)](https://razorpay.com)
+[![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=flat&logo=Firebase&logoColor=white)](https://firebase.google.com)
 
----
+**Grace Studio** is a premium, Flutter-powered cross-platform solution designed to bridge the gap between world-class media services and clients. Whether it's photography, videography, or drone cinematography, Grace Studio offers a high-performance interface for seamless scheduling and secure financial transactions.
 
-## Table of Contents
-- [Features](#features)
-- [Screens](#screens)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Technologies Used](#technologies-used)
-- [Usage](#usage)
-- [Future Enhancements](#future-enhancements)
-- [License](#license)
+## ✨ Key Features
 
----
+### 💎 The Client Experience
+* **Intuitive Service Suite:** Browse and select from high-end services like Editing, Drone Shoots, and Portraiture.
+* **Dynamic Booking Engine:** A streamlined flow with integrated date/time pickers and custom requirement fields.
+* **Secure Financials:** Fully integrated with **Razorpay** for industry-standard encryption and diverse payment methods.
+* **Real-time Tracking:** Dedicated dashboard for booking status, payment history, and past project summaries.
+* **Post-Service Engagement:** Built-in review and rating system to ensure quality control.
 
-## Features
+### 🛠 Technical Excellence
+* **Cross-Platform Harmony:** Optimized for pixel-perfect performance on Android, iOS, and Web.
+* **Role-Based Logic:** Secure user authentication and data privacy via Firebase.
+* **Modern UI/UX:** Responsive layouts featuring smooth transitions and a minimalist design aesthetic.
 
-### User Side
-- **Service Booking:** Choose from Photography, Videography, Editing, Drone Shoot, and more.
-- **Booking Form:** Enter details like name, email, phone, service, date, and additional notes.
-- **Date & Time Picker:** Select preferred date for service.
-- **Secure Payment Gateway:** Integrated with Razorpay for online payments.
-- **Booking Confirmation:** Success dialog showing payment ID and booking summary.
-- **Booking History:** Track upcoming and past bookings.
-- **Profile Management:** Update personal details.
-- **Notifications:** Alerts for upcoming bookings and payment status.
-- **Reviews & Ratings:** Rate and review completed services.
+### 📷 Prototype
 
----
+<div align="center">
+  <img src="pages/welcome_user.png" alt="User Dashboard" style="width: 90%; height: auto; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="pages/welcome_admin.png" alt="Admin Panel" style="width: 90%; height: auto; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="pages/booking.png" alt="Booking Interface" style="width: 90%; height: auto; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="pages/payments.png" alt="Payment Gateway" style="width: 90%; height: auto; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</div>
 
-## Screens
+## 📱 App Walkthrough
 
-1. **Login Screen**
-   - Secure login with email and password.
-   - Forgot password functionality.
-2. **Registration Screen**
-   - Create a new account with email and password.
-3. **Home Screen**
-   - View available services and navigate to booking.
-4. **Booking Screen**
-   - Fill booking details, select service, choose date, and pay online.
-5. **Payment Confirmation**
-   - Shows payment success/failure status with Razorpay payment ID.
-6. **Booking History**
-   - Track all bookings and payment history.
+1.  **Login & Identity:** Secure Firebase-backed authentication with email/password and recovery options.
+2.  **Service Discovery:** A clean, visual interface to explore available photography and videography packages.
+3.  **Booking Flow:** Select preferred dates, provide project notes, and proceed to checkout.
+4.  **Payment Confirmation:** Instant feedback with Razorpay Payment IDs and success dialogs.
+5.  **History & Profiles:** Comprehensive logs of all past bookings, upcoming schedules, and personal profile management.
 
----
 
-## Installation
+## 🚀 Tech Stack
+
+| Technology | Purpose |
+| :--- | :--- |
+| **Flutter & Dart** | UI Development & Business Logic |
+| **Firebase** | Authentication & Cloud Data Storage |
+| **Razorpay SDK** | Secure Payment Processing |
+
+
+## 🛠 Installation & Setup
 
 ### Prerequisites
-- Flutter SDK (>=3.0.0)
-- Dart SDK
-- Google Chrome (for web)
-- Firebase project (for authentication, optional)
+* **Flutter SDK** (v3.0.0 or higher)
+* **Dart SDK**
+* **Firebase Account** (for authentication)
+* **Razorpay API Keys**
 
-### Tech Stack
+### Getting Started
 
-Technologies Used
+1.  **Clone the Repository:**
+    ```bash
+    git clone [https://github.com/Akilesh-GA/GraceStudioWeb.git](https://github.com/Akilesh-GA/GraceStudioWeb.git)
+    cd GraceStudioWeb
+    ```
 
-Flutter & Dart: Cross-platform UI development
+2.  **Install Dependencies:**
+    ```bash
+    flutter pub get
+    ```
 
-Firebase: Authentication & optional data storage
+3.  **Configure Environment:**
+    * Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) to their respective directories.
+    * Initialize your Razorpay API keys in your configuration file.
 
-Razorpay: Online payment gateway integration
+4.  **Launch the App:**
+    ```bash
+    # For Web
+    flutter run -d chrome  
 
-HTML/JS: Web payment integration for Razorpay
+    # For Mobile
+    flutter run           
+    ```
 
-### Steps
-1. Clone the repository:
-
-```bash
-git clone https://github.com/your-username/grace-studio.git
-cd grace-studio
+## 📅 Future Roadmap
+* [ ] **AI Scheduling:** Automated slot suggestions based on photographer availability.
+* [ ] **Client Gallery:** In-app digital delivery of high-resolution media.
+* [ ] **Push Notifications:** SMS and Email alerts via Twilio/SendGrid integration.
