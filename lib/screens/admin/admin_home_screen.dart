@@ -84,7 +84,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         screen = const AdminBookingsScreen();
         break;
       case "Dashboard":
-        screen = const AdminDashboardScreen();
+        screen = const AdminWebDashboard();
         break;
       case "Applications":
         screen = const AdminApplicationsScreen();

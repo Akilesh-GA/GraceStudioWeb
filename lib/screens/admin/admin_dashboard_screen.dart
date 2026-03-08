@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-// Color Palette - Luxury Dark Theme
+// Color Palette
 const Color bgBlack = Color(0xFF050507);
 const Color purple = Color(0xFF7B2CBF);
 const Color neonPink = Color(0xFFFF006E);
@@ -31,89 +31,72 @@ class _AdminWebDashboardState extends State<AdminWebDashboard> {
 
           Row(
             children: [
-              /// 1. PROFESSIONAL SIDEBAR
-              _buildSidebar(),
+              /// 1. FIXED SIDEBAR
 
-              /// 2. CONTENT AREA
+              /// 2. SCROLLABLE CONTENT AREA
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: _buildMainGlassWrapper(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildHeader(),
-                        const SizedBox(height: 40),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: _buildMainGlassWrapper(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(),
+                          const SizedBox(height: 40),
 
-                        /// STATS WRAP (Responsive Grid)
-                        Wrap(
-                          spacing: 20,
-                          runSpacing: 20,
-                          children: const [
-                            _StatCard("Total Users", "1,248", Icons.people_outline, purple),
-                            _StatCard("Bookings", "326", Icons.auto_awesome_outlined, neonPink),
-                            _StatCard("Revenue", "₹4.2L", Icons.payments_outlined, Colors.blueAccent),
-                            _StatCard("System Health", "99.9%", Icons.bolt_rounded, Colors.greenAccent),
-                          ],
-                        ),
-
-                        const SizedBox(height: 48),
-                        const Text(
-                          "Platform Analytics",
-                          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(height: 24),
-
-                        /// ANALYTICS SECTION
-                        Expanded(
-                          child: Row(
+                          /// RESPONSIVE STATS GRID
+                          Wrap(
+                            spacing: 20,
+                            runSpacing: 20,
                             children: const [
-                              Expanded(flex: 3, child: _PieChartCard()),
-                              SizedBox(width: 24),
-                              Expanded(flex: 2, child: _InsightsCard()),
+                              _StatCard("Total Users", "1,248", Icons.people_outline, purple),
+                              _StatCard("Bookings", "326", Icons.auto_awesome_outlined, neonPink),
+                              _StatCard("Revenue", "₹4.2L", Icons.payments_outlined, Colors.blueAccent),
+                              _StatCard("System Health", "99.9%", Icons.bolt_rounded, Colors.greenAccent),
                             ],
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: 48),
+                          const Text(
+                            "Platform Analytics",
+                            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
+                          ),
+                          const SizedBox(height: 24),
+
+                          /// RESPONSIVE ANALYTICS SECTION
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              if (constraints.maxWidth < 900) {
+                                // Stack vertically on smaller screens to prevent overflow
+                                return Column(
+                                  children: const [
+                                    _PieChartCard(height: 400),
+                                    SizedBox(height: 24),
+                                    _InsightsCard(height: 400),
+                                  ],
+                                );
+                              }
+                              // Side-by-side on wide screens
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Expanded(flex: 3, child: _PieChartCard(height: 400)),
+                                  SizedBox(width: 24),
+                                  Expanded(flex: 2, child: _InsightsCard(height: 400)),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  /// SIDEBAR WIDGET
-  Widget _buildSidebar() {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 45, width: 45,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [purple, neonPink]),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.auto_fix_high_rounded, color: Colors.white),
-              ),
-              const SizedBox(width: 15),
-              const Text("LENS PRO", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 2)),
-            ],
-          ),
-          const SizedBox(height: 60),
-          _navItem(0, Icons.grid_view_rounded, "Dashboard"),
-          _navItem(1, Icons.qr_code_2_rounded, "QR Manager"),
-          _navItem(2, Icons.analytics_outlined, "Reports"),
-          _navItem(3, Icons.settings_outlined, "Settings"),
-          const Spacer(),
-          _navItem(4, Icons.logout_rounded, "Sign Out"),
         ],
       ),
     );
@@ -151,13 +134,13 @@ class _AdminWebDashboardState extends State<AdminWebDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text("Admin Overview", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: -1)),
-            Text("Real-time data from your photography portal", style: TextStyle(color: textGrey, fontSize: 14)),
+            Text("Real-time operational metrics", style: TextStyle(color: textGrey, fontSize: 14)),
           ],
         ),
-        CircleAvatar(
+        const CircleAvatar(
           radius: 25,
-          backgroundColor: Colors.white.withOpacity(0.05),
-          child: const Icon(Icons.person_outline, color: Colors.white),
+          backgroundColor: Colors.white12,
+          child: Icon(Icons.person_outline, color: Colors.white),
         )
       ],
     );
@@ -188,7 +171,6 @@ class _AdminWebDashboardState extends State<AdminWebDashboard> {
   }
 }
 
-/// STAT CARD WIDGET
 class _StatCard extends StatelessWidget {
   final String title, value;
   final IconData icon;
@@ -218,13 +200,14 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-/// PIE CHART CARD
 class _PieChartCard extends StatelessWidget {
-  const _PieChartCard();
+  final double height;
+  const _PieChartCard({required this.height});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.02),
@@ -235,7 +218,7 @@ class _PieChartCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text("Distribution", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           Expanded(
             child: PieChart(
               PieChartData(
@@ -255,13 +238,14 @@ class _PieChartCard extends StatelessWidget {
   }
 }
 
-/// INSIGHTS CARD
 class _InsightsCard extends StatelessWidget {
-  const _InsightsCard();
+  final double height;
+  const _InsightsCard({required this.height});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.02),
@@ -273,10 +257,18 @@ class _InsightsCard extends StatelessWidget {
         children: [
           const Text("Insights", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 30),
-          _insightRow("📈 Revenue up 12%"),
-          _insightRow("🔥 14 New Bookings"),
-          _insightRow("⚡ 99.9% Server Uptime"),
-          _insightRow("⭐ 4.9 Avg Rating"),
+          Expanded(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                _insightRow("📈 Revenue up 12% this month"),
+                _insightRow("🔥 14 New Bookings today"),
+                _insightRow("⚡ 99.9% Server Uptime"),
+                _insightRow("⭐ 4.9 Avg User Rating"),
+                _insightRow("⏳ Approval time down 15%"),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -285,7 +277,13 @@ class _InsightsCard extends StatelessWidget {
   Widget _insightRow(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
-      child: Text(text, style: const TextStyle(color: textGrey, fontSize: 15)),
+      child: Row(
+        children: [
+          const CircleAvatar(radius: 3, backgroundColor: neonPink),
+          const SizedBox(width: 12),
+          Expanded(child: Text(text, style: const TextStyle(color: textGrey, fontSize: 15))),
+        ],
+      ),
     );
   }
 }

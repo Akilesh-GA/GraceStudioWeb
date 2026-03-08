@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grace_studio/models/portfolio_data.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import for opening links
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
@@ -13,6 +14,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   final Color neonPink = const Color(0xFFEC4899);
   final Color bgDark = const Color(0xFF0A0615);
   final Color cardBlack = const Color(0xFF14141C);
+
+  // --- NEW: FUNCTION TO OPEN GOOGLE DRIVE ---
+  Future<void> _launchDrive(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Could not launch Drive link")),
+        );
+      }
+    }
+  }
 
   // --- PRIVILEGE: DELETE ---
   void _deleteProject(int index) {
@@ -54,6 +67,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // --- NEW: MANAGE DRIVE BUTTON (Only visible during Edit) ---
+              if (isEditing && driveController.text.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: ElevatedButton.icon(
+                    onPressed: () => _launchDrive(driveController.text),
+                    icon: const Icon(Icons.cloud_upload_outlined, size: 18),
+                    label: const Text("Open Drive to Upload"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent.withOpacity(0.15),
+                      foregroundColor: Colors.blueAccent,
+                      minimumSize: const Size(double.infinity, 45),
+                      side: const BorderSide(color: Colors.blueAccent, width: 0.5),
+                    ),
+                  ),
+                ),
+
               _buildAdminTextField(titleController, "Project Title"),
               const SizedBox(height: 12),
               _buildAdminTextField(descController, "Description", maxLines: 3),
