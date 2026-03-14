@@ -1,10 +1,14 @@
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:photofilters/photofilters.dart' as filters;
 import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class EditingStudioScreen extends StatefulWidget {
   const EditingStudioScreen({super.key});
@@ -19,55 +23,64 @@ class _EditingStudioScreenState extends State<EditingStudioScreen> {
   bool _showOriginal = false;
   bool _isProcessing = false;
 
-  final picker = ImagePicker();
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+  // 1. STATED INITIALIZATION: Ensure this is never null or ambiguous
+  String _statusMessage = "GRACE STUDIO READY";
 
-  void _showMessage(String message) {
-    _scaffoldKey.currentState?.clearSnackBars();
-    _scaffoldKey.currentState?.showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: const Color(0xFF6D28D9), behavior: SnackBarBehavior.floating),
-    );
+  final picker = ImagePicker();
+
+  void _updateStatus(String msg) {
+    if (!mounted) return;
+    setState(() => _statusMessage = msg);
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        setState(() {
+          _statusMessage = _imageData == null ? "READY TO START" : "STUDIO ACTIVE";
+        });
+      }
+    });
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final bytes = await pickedFile.readAsBytes();
-      setState(() {
-        _imageData = bytes;
-        _originalData = bytes;
-      });
+    try {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _imageData = bytes;
+          _originalData = bytes;
+        });
+        _updateStatus("IMAGE IMPORTED");
+      }
+    } catch (e) {
+      _updateStatus("IMPORT FAILED");
     }
   }
 
   Future<void> _applyFilters(BuildContext context) async {
-    if (_imageData == null) {
-      _showMessage("Upload an image first!");
-      return;
-    }
-
+    if (_imageData == null) return;
     setState(() => _isProcessing = true);
 
     try {
       img.Image? decodedImage = img.decodeImage(_imageData!);
       if (decodedImage == null) {
-        _showMessage("Invalid image format");
+        _updateStatus("UNSUPPORTED FORMAT");
         setState(() => _isProcessing = false);
         return;
       }
 
-      if (decodedImage.width > 1500) {
-        decodedImage = img.copyResize(decodedImage, width: 1500);
+      if (decodedImage.width > 1200) {
+        decodedImage = img.copyResize(decodedImage, width: 1200);
       }
 
       final Map? filteredResult = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (ctx) => filters.PhotoFilterSelector(
-            title: Text("Grace Studio Filters", style: GoogleFonts.poppins()),
+            title: Text("STUDIO PRESETS",
+                style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             image: decodedImage!,
             filters: filters.presetFiltersList,
-            filename: "edit_${DateTime.now().millisecondsSinceEpoch}.jpg",
+            filename: "studio_${DateTime.now().millisecondsSinceEpoch}.jpg",
             loader: const Center(child: CircularProgressIndicator(color: Color(0xFFEC4899))),
             fit: BoxFit.contain,
           ),
@@ -75,93 +88,135 @@ class _EditingStudioScreenState extends State<EditingStudioScreen> {
       );
 
       if (filteredResult != null && filteredResult.containsKey('image_filtered')) {
-        final img.Image resultImg = filteredResult['image_filtered'];
         setState(() {
-          _imageData = Uint8List.fromList(img.encodeJpg(resultImg));
+          _imageData = Uint8List.fromList(img.encodeJpg(filteredResult['image_filtered']));
           _isProcessing = false;
         });
-        _showMessage("Filter Applied!");
+        _updateStatus("FILTER APPLIED");
       } else {
         setState(() => _isProcessing = false);
       }
     } catch (e) {
       setState(() => _isProcessing = false);
-      _showMessage("Error: $e");
+      _updateStatus("PROCESS ERROR");
+    }
+  }
+
+  Future<void> _downloadImage() async {
+    if (_imageData == null) return;
+    setState(() => _isProcessing = true);
+    _updateStatus("DOWNLOADING...");
+
+    try {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        await Permission.photos.request();
+      }
+
+      final result = await ImageGallerySaver.saveImage(
+        _imageData!,
+        quality: 95,
+        name: "GraceStudio_${DateTime.now().millisecondsSinceEpoch}",
+      );
+
+      if (result != null && result['isSuccess'] == true) {
+        _updateStatus("SAVED TO GALLERY ✨");
+      } else {
+        _updateStatus("DOWNLOAD FAILED");
+      }
+    } catch (e) {
+      _updateStatus("DOWNLOAD ERROR");
+    } finally {
+      setState(() => _isProcessing = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldMessenger(
-      key: _scaffoldKey,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: Text("Grace Studio", style: GoogleFonts.greatVibes(fontSize: 30, color: Colors.white)),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView( // Fixes Bottom Overflow
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Column(
-                  children: [
-                    // Preview Area with dynamic sizing
-                    SizedBox(
-                      height: constraints.maxHeight * 0.7,
-                      child: Center(
-                        child: _imageData == null
-                            ? _buildEmptyState()
-                            : _buildPreviewArea(),
-                      ),
-                    ),
-                    // Control Panel at the bottom
-                    _buildControlPanel(context),
-                  ],
+    // 2. DEFENSIVE CODING: Extract logic to local variables with null checks
+    // We use 'contains' only after ensuring the object isn't undefined in JS terms.
+    final currentStatus = _statusMessage;
+    final bool isSuccess = currentStatus.isNotEmpty && currentStatus.contains("✨");
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text("Grace Studio",
+            style: GoogleFonts.greatVibes(fontSize: 34, color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: Text(
+                  currentStatus,
+                  style: GoogleFonts.poppins(
+                      color: isSuccess ? Colors.greenAccent : Colors.white24,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2.5
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+              Expanded(
+                child: Center(
+                  child: _imageData == null
+                      ? _buildEmptyState()
+                      : _buildPreviewArea(),
+                ),
+              ),
+              _buildControlPanel(context),
+            ],
+          ),
+          if (_isProcessing)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFFEC4899), strokeWidth: 3),
+              ),
+            ),
+        ],
       ),
     );
   }
 
   Widget _buildPreviewArea() {
+    // 3. SAFE LOCALS: Create local references to avoid racing conditions during rebuilds
+    final Uint8List? data = _imageData;
+    final Uint8List? original = _originalData;
+
+    if (data == null || original == null) return _buildEmptyState();
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          _showOriginal ? "ORIGINAL VIEW" : "EDITED VIEW",
-          style: TextStyle(
-              color: _showOriginal ? Colors.yellow : Colors.pinkAccent,
-              fontWeight: FontWeight.bold,
-              fontSize: 12
-          ),
-        ),
-        const SizedBox(height: 10),
         Flexible(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: Colors.pink.withOpacity(0.1), blurRadius: 20)],
-            ),
+            margin: const EdgeInsets.all(24),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20),
               child: GestureDetector(
                 onLongPressStart: (_) => setState(() => _showOriginal = true),
                 onLongPressEnd: (_) => setState(() => _showOriginal = false),
-                child: Image.memory(_showOriginal ? _originalData! : _imageData!, fit: BoxFit.contain),
+                child: Image.memory(
+                    _showOriginal ? original : data,
+                    fit: BoxFit.contain
+                ),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 10),
-        const Text("Hold image to compare", style: TextStyle(color: Colors.white24, fontSize: 10)),
+        const SizedBox(height: 12),
+        Text(
+            _showOriginal ? "VIEWING ORIGINAL" : "LONG PRESS TO COMPARE",
+            style: GoogleFonts.poppins(color: Colors.white10, fontSize: 9, fontWeight: FontWeight.bold)
+        ),
       ],
     );
   }
@@ -170,55 +225,49 @@ class _EditingStudioScreenState extends State<EditingStudioScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.blur_on_rounded, size: 80, color: Colors.white.withOpacity(0.1)),
+        Icon(Icons.photo_filter_rounded, size: 60, color: Colors.white.withOpacity(0.05)),
         const SizedBox(height: 20),
-        const Text("Upload a photo to start editing", style: TextStyle(color: Colors.white24)),
+        Text("IMPORT IMAGE TO START",
+            style: GoogleFonts.poppins(color: Colors.white12, fontSize: 11, letterSpacing: 1)),
       ],
     );
   }
 
   Widget _buildControlPanel(BuildContext context) {
+    final bool hasImage = _imageData != null;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F0F13),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      padding: const EdgeInsets.only(top: 25, bottom: 45, left: 20, right: 20),
+      decoration: const BoxDecoration(
+        color: Color(0xFF0F0F13),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _toolButton(Icons.add_photo_alternate_outlined, "Import", _pickImage),
-          _toolButton(
-              _isProcessing ? Icons.sync : Icons.color_lens_outlined,
-              "Filters",
-              _isProcessing ? () {} : () => _applyFilters(context)
-          ),
-          _toolButton(Icons.history_rounded, "Reset", () {
-            if (_originalData != null) {
-              setState(() => _imageData = _originalData);
-              _showMessage("Reverted to original");
-            }
-          }),
-          _toolButton(Icons.ios_share_rounded, "Export", () => _showMessage("Exporting... (Web: Right click to save)")),
+          _studioButton(Icons.add_photo_alternate_rounded, "IMPORT", _pickImage),
+          _studioButton(Icons.style_rounded, "PRESETS", hasImage ? () => _applyFilters(context) : null),
+          _studioButton(Icons.refresh_rounded, "RESET", hasImage ? () {
+            setState(() => _imageData = _originalData);
+            _updateStatus("RESET COMPLETE");
+          } : null),
+          _studioButton(Icons.file_download_outlined, "DOWNLOAD", hasImage ? _downloadImage : null),
         ],
       ),
     );
   }
 
-  Widget _toolButton(IconData icon, String label, VoidCallback action) {
-    return InkWell(
-      onTap: action,
-      borderRadius: BorderRadius.circular(15),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+  Widget _studioButton(IconData icon, String label, VoidCallback? action) {
+    return Opacity(
+      opacity: action == null ? 0.2 : 1.0,
+      child: InkWell(
+        onTap: action,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: const Color(0xFFEC4899), size: 24),
+            Icon(icon, color: const Color(0xFFEC4899), size: 28),
             const SizedBox(height: 6),
-            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 10)),
+            Text(label, style: GoogleFonts.poppins(color: Colors.white38, fontSize: 8, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
